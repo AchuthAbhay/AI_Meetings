@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Minutes Generator - ASR</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+<div class="container">
+
+    <!-- ================= HEADER ================= -->
+    <header class="header">
+        <h1><i class="fas fa-microphone"></i> Meeting Minutes Generator</h1>
+        <p>Audio → Transcript → Summary</p>
+    </header>
+
+    <!-- ================= UPLOAD SECTION ================= -->
+    <section class="upload-section">
+        <div class="upload-box" id="uploadBox">
+            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+            <h3>Upload Meeting Audio</h3>
+            <p>Supports WAV, MP3, M4A, FLAC</p>
+
+            <input type="file"
+                   id="audioFile"
+                   accept=".wav,.mp3,.m4a,.flac"
+                   hidden>
+
+            <button class="upload-btn"
+                    onclick="document.getElementById('audioFile').click()">
+                <i class="fas fa-folder-open"></i> Choose File
+            </button>
+
+            <div class="file-name" id="fileName"></div>
+        </div>
+
+        <button class="transcribe-btn"
+                id="transcribeBtn"
+                onclick="transcribeAudio()"
+                disabled>
+            <i class="fas fa-play"></i> Transcribe Meeting
+        </button>
+    </section>
+
+    <!-- ================= PROGRESS ================= -->
+    <section class="progress-section"
+             id="progressSection"
+             style="display: none;">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-text">Processing audio...</div>
+    </section>
+
+    <!-- ================= RESULTS ================= -->
+    <section class="results-section"
+             id="resultsSection"
+             style="display: none;">
+
+        <!-- METRICS -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <i class="fas fa-font"></i>
+                <div class="metric-value" id="wordCount">-</div>
+                <div class="metric-label">Words</div>
+            </div>
+
+            <div class="metric-card">
+                <i class="fas fa-clock"></i>
+                <div class="metric-value" id="duration">-</div>
+                <div class="metric-label">Duration</div>
+            </div>
+
+            <div class="metric-card">
+                <i class="fas fa-chart-line"></i>
+                <div class="metric-value" id="confidence">-</div>
+                <div class="metric-label">Avg Confidence</div>
+            </div>
+        </div>
+
+        <!-- TRANSCRIPT -->
+        <div class="transcript-section">
+            <h3><i class="fas fa-file-alt"></i> Transcript</h3>
+            <div class="transcript-container"
+                 id="transcriptContainer"></div>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div class="actions">
+
+            <!-- Download Transcript -->
+            <button class="download-btn"
+                    id="downloadBtn"
+                    onclick="downloadTranscript()">
+                <i class="fas fa-download"></i> Download Transcript (JSON)
+            </button>
+
+            <!-- Generate Summary (hidden until transcription completes) -->
+            <button class="download-btn"
+                    id="generateSummaryBtn"
+                    onclick="generateSummary()"
+                    style="display:none;">
+                <i class="fas fa-align-left"></i> Generate Summary
+            </button>
+
+        </div>
+
+        <!-- ================= SUMMARY SECTION ================= -->
+        <!-- ================= SUMMARY SECTION ================= -->
+    <div class="summary-section" id="summarySection" style="display:none; margin-top:30px;">
+
+     <h3><i class="fas fa-file-signature"></i> Professional Meeting Summary</h3>
+
+     <div class="summary-container" id="summaryContainer"></div>
+
+     <div style="text-align:center; margin-top:20px;">
+        <button class="download-btn"
+                id="downloadSummaryBtn"
+                onclick="downloadSummary()">
+            <i class="fas fa-file-pdf"></i> Download Summary PDF
+        </button>
+
+        <button class="download-btn"
+                onclick="resetSession()"
+                style="background:#6c757d; margin-left:10px;">
+            Reset Session
+        </button>
+      </div>
+    </div>
+
+    </section>
+
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

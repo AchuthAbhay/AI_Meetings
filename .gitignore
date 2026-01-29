@@ -1,0 +1,46 @@
+# ======================
+# Python / Virtual Env
+# ======================
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# ======================
+# Environment variables
+# ======================
+.env
+
+# ======================
+# Audio & Generated Files
+# ======================
+uploads/
+transcripts/
+logs/
+*.wav
+*.mp3
+*.m4a
+*.flac
+*.json
+*.pdf
+
+# ======================
+# OS / Editor files
+# ======================
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# ======================
+# Jupyter / temp
+# ======================
+.ipynb_checkpoints/
+
+# ======================
+# Cache
+# ======================
+.cache/
