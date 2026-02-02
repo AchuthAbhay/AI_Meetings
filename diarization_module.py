@@ -11,9 +11,11 @@ ASSEMBLYAI_BASE_URL = "https://api.assemblyai.com/v2"
 
 class DiarizationModule:
     """
-    Speaker diarization using AssemblyAI.
-    This module is intentionally isolated so it can be
-    replaced later (e.g., PyAnnote) without touching the rest of the system.
+    AssemblyAI ka use karke speaker diarization karta hai.
+
+    Ye module isolated hai:
+    future me PyAnnote ya koi aur model use kar sakte hain
+    bina baaki system ko todhe.
     """
 
     def __init__(self):
@@ -38,7 +40,7 @@ class DiarizationModule:
         ]
         """
 
-        audio_url = self._upload_audio(audio_path)
+        audio_url = self._upload_audio(audio_path)                  # 🔹 Audio ko AssemblyAI server par upload karo
         transcript_id = self._start_transcription(audio_url)
         transcript_data = self._poll_transcription(transcript_id)
 

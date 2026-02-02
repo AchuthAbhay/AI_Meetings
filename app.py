@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, render_template, send_file
 from asr_module import ASRModule
 from summarizer_module import SummarizerModule
 
-# OPTIONAL diarization (safe import)
+# 🔹 Diarization optional hai (fail hone par app crash nahi hoga)
 try:
     from diarization_module import DiarizationModule
     from merge_diarization import merge_whisper_with_diarization

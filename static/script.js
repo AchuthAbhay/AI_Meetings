@@ -1,22 +1,22 @@
 let currentTranscript = null;
-let currentSummary = "";
+let currentSummary = "";          // 📄 Ye apna summary text store karega
 
 /* =========================
    FILE SELECTION
 ========================= */
-document.getElementById('audioFile').addEventListener('change', function (e) {
+document.getElementById('audioFile').addEventListener('change', function (e) {   //File select hone par
     const fileName = e.target.files[0]?.name || '';
     document.getElementById('fileName').textContent =
         fileName ? `Selected: ${fileName}` : '';
-    document.getElementById('transcribeBtn').disabled = !fileName;
+    document.getElementById('transcribeBtn').disabled = !fileName; // Transcribe button enable/disable karo
 });
 
 /* =========================
    TRANSCRIPTION
 ========================= */
 async function transcribeAudio() {
-    const file = document.getElementById('audioFile').files[0];
-    if (!file) return;
+    const file = document.getElementById('audioFile').files[0]; // Select ki hui file lo
+    if (!file) return;      // Agar file select nahi hui hai to return karo
 
     document.getElementById('uploadBox').style.display = 'none';
     document.getElementById('progressSection').style.display = 'block';
@@ -24,7 +24,7 @@ async function transcribeAudio() {
     const formData = new FormData();
     formData.append('audio', file);
 
-    const response = await fetch('/transcribe', {
+    const response = await fetch('/transcribe', {  // Flask backend ko request bhejo ,audio apan backend ko bhejre hai
         method: 'POST',
         body: formData
     });

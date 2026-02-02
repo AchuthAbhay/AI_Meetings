@@ -6,7 +6,7 @@ def merge_whisper_with_diarization(
     diarization_segments: List[Dict]
 ) -> List[Dict]:
     """
-    Merge Whisper ASR segments with speaker diarization.
+    Whisper ASR ke segments ko diarization (speaker info) ke saath merge karta hai.
 
     Returns:
     [
@@ -22,7 +22,7 @@ def merge_whisper_with_diarization(
     merged = []
     current_block = None
 
-    for w in whisper_segments:
+    for w in whisper_segments:               # Whisper ke har segment par iterate karte hain
         midpoint = (w["start"] + w["end"]) / 2
         speaker = "Unknown"
 
@@ -33,14 +33,14 @@ def merge_whisper_with_diarization(
 
         if (
             current_block
-            and current_block["speaker"] == speaker
+            and current_block["speaker"] == speaker               # Agar same speaker continue ho raha hai, to text merge karo
         ):
             # Extend current speaker block
             current_block["end"] = w["end"]
             current_block["text"] += " " + w["text"]
         else:
             # Start new speaker block
-            current_block = {
+            current_block = {                               # Naya speaker block start karo
                 "speaker": speaker,
                 "start": w["start"],
                 "end": w["end"],
