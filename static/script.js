@@ -37,9 +37,17 @@ async function transcribeAudio() {
         return;
     }
 
-    currentTranscript = result.transcript;
-    localStorage.setItem("transcript", JSON.stringify(currentTranscript));
+    // ✅ Prefer diarized transcript if available
+    if (result.merged_transcript) {
+        currentTranscript = {
+            segments: result.merged_transcript,
+            metrics: result.transcript.metrics
+        };
+    } else {
+        currentTranscript = result.transcript;
+    }
 
+    localStorage.setItem("transcript", JSON.stringify(currentTranscript));
     displayTranscript(currentTranscript);
 }
 
@@ -66,10 +74,31 @@ function displayTranscript(transcript) {
                 <div class="transcript-time">
                     ${seg.start.toFixed(1)}s – ${seg.end.toFixed(1)}s
                 </div>
-                <div class="transcript-text">${seg.text}</div>
+                <div class="transcript-text">
+                    ${seg.speaker ? `<strong>[${seg.speaker}]</strong> ` : ""}
+                    ${seg.text}
+                </div>
             </div>
         `;
     });
+}
+
+/* =========================
+   DOWNLOAD TRANSCRIPT JSON
+========================= */
+function downloadTranscript() {
+    if (!currentTranscript) return;
+
+    const blob = new Blob(
+        [JSON.stringify(currentTranscript, null, 2)],
+        { type: "application/json" }
+    );
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "transcript.json";
+    a.click();
+    URL.revokeObjectURL(url);
 }
 
 /* =========================
@@ -101,14 +130,13 @@ function renderSummary(text) {
     const container = document.getElementById("summaryContainer");
     container.innerHTML = "";
 
-    // 🔹 Clean broken lines like "6\n00 PM"
+    // Fix broken numbers like "6\n00 PM"
     text = text.replace(/(\d)\n(\d)/g, "$1$2");
 
     const blocks = text.split(/\n\s*\n/).map(b => b.trim()).filter(Boolean);
 
     blocks.forEach(block => {
         const lines = block.split("\n").map(l => l.trim()).filter(Boolean);
-
         const card = document.createElement("div");
         card.className = "summary-card";
 
@@ -116,23 +144,22 @@ function renderSummary(text) {
 
         lines.forEach((line, index) => {
 
-            // 🔷 SECTION TITLE
+            // SECTION TITLE
             if (
                 index === 0 &&
                 !line.startsWith("-") &&
                 !line.startsWith('"') &&
-                line === line.toUpperCase() || line.endsWith(":")
+                (line === line.toUpperCase() || line.endsWith(":"))
             ) {
                 const title = document.createElement("h4");
                 title.textContent = line.replace(":", "");
                 card.appendChild(title);
-
                 list = document.createElement("ul");
                 card.appendChild(list);
                 return;
             }
 
-            // 🔹 BULLET POINT
+            // BULLET POINT
             if (line.startsWith("-")) {
                 if (!list) {
                     list = document.createElement("ul");
@@ -144,7 +171,7 @@ function renderSummary(text) {
                 return;
             }
 
-            // 🔸 QUOTE
+            // QUOTE
             if (line.startsWith('"')) {
                 const quote = document.createElement("blockquote");
                 quote.textContent = line;
@@ -152,7 +179,7 @@ function renderSummary(text) {
                 return;
             }
 
-            // 🔹 NORMAL PARAGRAPH
+            // PARAGRAPH
             const p = document.createElement("p");
             p.textContent = line;
             card.appendChild(p);
@@ -161,31 +188,32 @@ function renderSummary(text) {
         container.appendChild(card);
     });
 
-    // ✅ SHOW UI CONTROLS
-    document.getElementById("summarySection").style.display = "block";
     document.getElementById("downloadSummaryBtn").style.display = "inline-flex";
 }
 
-
 /* =========================
-   DOWNLOAD PDF
+   DOWNLOAD SUMMARY PDF
 ========================= */
 function downloadSummary() {
     window.open("/download_pdf", "_blank");
 }
 
-
 /* =========================
    RESTORE STATE ON RELOAD
 ========================= */
 document.addEventListener("DOMContentLoaded", () => {
+    const savedTranscript = localStorage.getItem("transcript");
     const savedSummary = localStorage.getItem("summary");
+
+    if (savedTranscript) {
+        currentTranscript = JSON.parse(savedTranscript);
+        displayTranscript(currentTranscript);
+    }
 
     if (savedSummary) {
         renderSummary(savedSummary);
     }
 });
-
 
 /* =========================
    RESET SESSION
