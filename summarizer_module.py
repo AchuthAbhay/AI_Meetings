@@ -33,9 +33,6 @@ EXECUTIVE SUMMARY:
 KEY DECISIONS:
 - Bullet list of decisions (include approvals/rejections)
 
-ACTION ITEMS:
-- Bullet list with owner + responsibility (if mentioned)
-
 CONTROVERSIES / CONCERNS:
 - Bullet list of disagreements or public concerns
 

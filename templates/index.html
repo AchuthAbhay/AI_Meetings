@@ -77,17 +77,33 @@
             <div class="transcript-container" id="transcriptContainer"></div>
         </div>
 
-        <!-- ACTIONS -->
-        <div class="actions">
-            <button class="download-btn" onclick="downloadTranscript()">
-                <i class="fas fa-download"></i> Download Transcript (JSON)
-            </button>
+<!-- ACTIONS -->
+<div class="actions">
 
-            <button class="download-btn" id="generateSummaryBtn"
-                    onclick="generateSummary()" style="display:none;">
-                <i class="fas fa-align-left"></i> Generate Summary
-            </button>
-        </div>
+    <button class="download-btn" onclick="downloadTranscript()">
+        <i class="fas fa-download"></i> Download Transcript (JSON)
+    </button>
+
+    <button class="download-btn" id="generateSummaryBtn" onclick="generateSummary()" style="display:none;">
+        <i class="fas fa-align-left"></i> Generate Summary
+    </button>
+
+    <button class="download-btn" id="actionItemsBtn" onclick="extractActionItems()" style="display:none; background: #ffc107; color: #000;">
+        <i class="fas fa-tasks"></i> Extract Action Items
+    </button>
+
+    <button class="download-btn" id="sentimentBtn" onclick="analyzeSentiment()" style="display:none; background: #42c175; color: #fff;">
+        <i class="fas fa-brain"></i> Analyse Sentiment
+    </button>
+    
+</div>
+
+<div id="sentiment-output" class="result-container" style="display: none; margin-top: 20px;"></div>
+
+<div id="action-output" class="result-container" style="margin-top: 20px;"></div>
+
+<div id="sentiment-output" class="result-container" style="display: none; margin-top: 20px;"></div>
+
 
         <!-- SUMMARY -->
         <div class="summary-section" id="summarySection" style="display:none; margin-top:30px;">

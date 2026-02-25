@@ -1,6 +1,9 @@
 from flask import Flask, request, jsonify, render_template, send_file
 from asr_module import ASRModule
 from summarizer_module import SummarizerModule
+from action_item_module import ActionItemModule
+from sentiment_module import SentimentModule
+
 
 # 🔹 Diarization optional hai (fail hone par app crash nahi hoga)
 try:
@@ -33,6 +36,8 @@ logger = logging.getLogger(__name__)
 
 asr = ASRModule()
 summarizer = SummarizerModule()
+action_extractor = ActionItemModule()
+
 
 # Initialize diarization only if available
 diarizer = DiarizationModule() if DIARIZATION_AVAILABLE else None
@@ -120,6 +125,76 @@ def summarize():
         f.write(summary)
 
     return jsonify({"success": True, "summary": summary})
+
+# -------------------------
+# ACTION ITEMS (new endpoint)
+# -------------------------
+@app.route("/action_items", methods=["POST"])
+def action_items():
+    """Extract action items from latest transcript."""
+    
+    # Same transcript loading as summarize
+    merged_path = os.path.join(TRANSCRIPTS_DIR, "merged.json")
+    transcript_path = os.path.join(TRANSCRIPTS_DIR, "latest.json")
+
+    if os.path.exists(merged_path):
+        with open(merged_path, encoding="utf-8") as f:
+            merged = json.load(f)
+        full_text = "\n".join(f"[{seg.get('speaker', 'Speaker')}] {seg['text']}" for seg in merged)
+    elif os.path.exists(transcript_path):
+        with open(transcript_path, encoding="utf-8") as f:
+            data = json.load(f)
+        full_text = " ".join(seg["text"] for seg in data["segments"])
+    else:
+        return jsonify({"success": False, "error": "No transcript found. Transcribe first."}), 400
+
+    # Extract action items (fast with Groq)
+    action_items = action_extractor.extract(full_text)
+    
+    # Save files
+    action_extractor.save_to_file(action_items, "action_items.json")
+    
+    return jsonify({
+        "success": True,
+        "count": len(action_items),
+        "formatted": action_extractor.format_summary(action_items),
+        "items": [{"task": i.task, "assignee": i.assignee, "deadline": str(i.deadline) if i.deadline else None, 
+                   "priority": i.priority, "source_text": i.source_text} for i in action_items]
+
+    })
+# -------------------------
+# SENTIMENT ANALYSIS
+# -------------------------
+@app.route('/sentiment', methods=['POST'])
+def sentiment():
+    try:
+        merged_path = "transcripts/merged.json"
+        latest_path = "transcripts/latest.json"
+
+        if os.path.exists(merged_path):
+            with open(merged_path) as f:
+                segments = json.load(f)
+        elif os.path.exists(latest_path):
+            with open(latest_path) as f:
+                data = json.load(f)
+                segments = data.get("segments", [])
+        else:
+            return jsonify({"success": False, "error": "No transcript found. Please transcribe first."})
+
+        transcript_text = "\n".join(
+            f"{seg.get('speaker', 'Speaker')}: {seg.get('text', '')}"
+            for seg in segments
+        )
+
+        module = SentimentModule()
+        result = module.analyze(transcript_text)
+        module.save_to_file(result)
+
+        return jsonify({"success": True, "result": result})
+
+    except Exception as e:
+        logger.error(f"Sentiment route error: {e}")
+        return jsonify({"success": False, "error": str(e)})
 
 # -------------------------
 # DOWNLOAD SUMMARY PDF

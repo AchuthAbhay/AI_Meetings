@@ -1,9 +1,9 @@
 # =========================
 # Core ASR (Whisper)
 # =========================
-openai-whisper==20231117
-torch==2.0.1
-torchaudio==2.0.2
+openai-whisper
+torch
+torchaudio
 
 # =========================
 # Audio Processing

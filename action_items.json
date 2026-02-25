@@ -1,0 +1,23 @@
+[
+  {
+    "task": "Prepare Q1 budget report",
+    "assignee": null,
+    "deadline": null,
+    "priority": "medium",
+    "source_text": "Thank you. We are going to add on  our question period that we have every council meeting."
+  },
+  {
+    "task": "Fill out grant applications",
+    "assignee": "Administration",
+    "deadline": null,
+    "priority": "high",
+    "source_text": "I know it's not always so easy to fill out grant applications  and things like that."
+  },
+  {
+    "task": "Follow up on grant applications response",
+    "assignee": null,
+    "deadline": null,
+    "priority": "medium",
+    "source_text": "And we should hear back in a couple months on these applications."
+  }
+]
