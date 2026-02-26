@@ -1,9 +1,9 @@
 # =========================
 # Core ASR (Whisper)
 # =========================
-openai-whisper
-torch
-torchaudio
+openai-whisper==20231117
+torch==2.0.1+cpu
+torchaudio==2.0.2+cpu
 
 # =========================
 # Audio Processing
@@ -11,7 +11,7 @@ torchaudio
 librosa==0.10.1
 soundfile==0.12.1
 numpy==1.26.4
-numba==0.63.1
+numba==0.57.1
 
 # =========================
 # Backend (Flask)
@@ -19,22 +19,22 @@ numba==0.63.1
 Flask==3.0.0
 Werkzeug==3.0.0
 python-dotenv==1.0.0
-python-logging-loki==0.3.1
 requests==2.31.0
 pydantic==2.5.0
 
 # =========================
-# NLP / Summarization
+# NLP / Summarization / Sentiment
 # =========================
 transformers==4.36.2
 sentencepiece==0.1.99
-tiktoken==0.12.0
+tiktoken==0.5.2
+huggingface-hub==0.20.3
 
 # =========================
-# PDF Export
+# PDF Export (FIXED VERSION)
 # =========================
 fpdf==1.7.2
-reportlab==4.4.9
+reportlab==4.0.8
 
 # =========================
 # Utilities
