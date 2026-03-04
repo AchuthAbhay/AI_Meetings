@@ -1,40 +1,50 @@
 import os
-import requests
 import logging
+from groq import Groq
 from dotenv import load_dotenv
 
 load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-PERPLEXITY_API_KEY = os.getenv("PERPLEXITY_API_KEY")
-PERPLEXITY_URL = "https://api.perplexity.ai/chat/completions"
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 
 class SummarizerModule:
+    """
+    Meeting transcript ko structured professional summary me convert karta hai.
+    Ab Perplexity Sonar-Pro ki jagah Groq LLaMA-3.1-8B use karta hai.
+    """
 
     def __init__(self):
+        if not GROQ_API_KEY:
+            raise ValueError("GROQ_API_KEY not found in .env")
 
-        if not PERPLEXITY_API_KEY:
-            raise ValueError("PERPLEXITY_API_KEY not found in .env")
+        # Groq client
+        self.client = Groq(api_key=GROQ_API_KEY)
+        # Fast + good quality model
+        self.model = "llama-3.1-8b-instant"
+        logger.info("SummarizerModule (Groq) initialized")
 
     def summarize(self, transcript_text: str) -> str:
         """
-        Meeting transcript ko structured professional summary me convert karta hai.
-        Supports speaker-labeled transcripts from AssemblyAI.
+        Full transcript (speaker-labeled text) ko structured summary me convert karta hai.
         """
 
-        logger.info("Generating meeting summary using Sonar-Pro")
+        if not transcript_text.strip():
+            raise ValueError("Transcript text is empty")
+
+        logger.info("Generating meeting summary using Groq LLaMA")
 
         prompt = f"""
-You are an expert government meeting analyst.
+You are an expert government and corporate meeting analyst.
 
 Your task is to generate a PROFESSIONAL STRUCTURED MEETING SUMMARY.
 
 The transcript contains multiple speakers labeled like:
-[Speaker A], [Speaker B], etc.
+Speaker 0, Speaker 1, etc.
 
-Analyze carefully and produce this EXACT format:
+Analyse carefully and produce this EXACT format:
 
 EXECUTIVE SUMMARY:
 - 3–5 bullet points explaining overall meeting outcome
@@ -57,48 +67,32 @@ MEETING SENTIMENT:
 
 TRANSCRIPT:
 \"\"\"
-{transcript_text}
+{transcript_text[:12000]}
 \"\"\"
 """
 
-        payload = {
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You are a precise meeting summarization assistant. "
+                                   "Return only the summary in the requested format.",
+                    },
+                    {
+                        "role": "user",
+                        "content": prompt,
+                    },
+                ],
+                temperature=0.2,
+                max_tokens=1500,
+            )
 
-            "model": "sonar-pro",
+            summary = response.choices[0].message.content.strip()
+            logger.info("Summary generated successfully (Groq)")
+            return summary
 
-            "messages": [
-                {
-                    "role": "system",
-                    "content": "You are a precise meeting summarization assistant."
-                },
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ],
-
-            "temperature": 0.2
-        }
-
-        headers = {
-            "Authorization": f"Bearer {PERPLEXITY_API_KEY}",
-            "Content-Type": "application/json"
-        }
-
-        response = requests.post(
-            PERPLEXITY_URL,
-            json=payload,
-            headers=headers,
-            timeout=120
-        )
-
-        if response.status_code != 200:
-
-            logger.error(response.text)
-
-            raise RuntimeError("Perplexity API failed")
-
-        summary = response.json()["choices"][0]["message"]["content"]
-
-        logger.info("Summary generated successfully")
-
-        return summary
+        except Exception as e:
+            logger.error(f"Groq summarization failed: {e}")
+            raise RuntimeError("Groq API failed for summary")

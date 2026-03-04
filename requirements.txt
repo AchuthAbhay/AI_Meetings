@@ -41,3 +41,4 @@ reportlab==4.0.8
 # =========================
 tqdm==4.67.1
 more-itertools==10.8.0
+sarvamai

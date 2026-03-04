@@ -1,140 +1,100 @@
+# transcription.py
+
 import os
-import time
-import requests
 import logging
 from dotenv import load_dotenv
+from sarvamai import SarvamAI
 
 load_dotenv()
-
 logger = logging.getLogger(__name__)
 
-ASSEMBLYAI_API_KEY = os.getenv("ASSEMBLYAI_API_KEY")
-BASE_URL = "https://api.assemblyai.com/v2"
+SARVAM_API_KEY = os.getenv("SARVAM_API_KEY")
 
 
 class TranscriptionModule:
     """
-    AssemblyAI-based transcription + speaker diarization module
-    Whisper replacement
+    Sarvam AI Batch STT + Speaker Diarization
+    Drop-in replacement for AssemblyAI module
     """
 
     def __init__(self):
+        if not SARVAM_API_KEY:
+            raise ValueError("SARVAM_API_KEY not found in .env")
 
-        if not ASSEMBLYAI_API_KEY:
-            raise ValueError("ASSEMBLYAI_API_KEY not found")
+        self.client = SarvamAI(api_subscription_key=SARVAM_API_KEY)
+        logger.info("TranscriptionModule initialized with Sarvam AI")
 
-        self.headers = {
-            "authorization": ASSEMBLYAI_API_KEY,
-            "content-type": "application/json"
-        }
+    def transcribe_file(self, audio_path: str) -> dict:
 
-    def transcribe_file(self, audio_path):
+        logger.info("Creating Sarvam batch job...")
 
-        logger.info("Uploading audio to AssemblyAI...")
+        # Create job with diarization enabled
+        job = self.client.speech_to_text_job.create_job(
+    model="saaras:v3",
+    mode="translate",
+    language_code="unknown",
+    with_diarization=True,
+    # num_speakers not provided → Sarvam estimates automatically
+)
 
-        upload_url = self._upload_audio(audio_path)
 
-        logger.info("Starting transcription...")
+        logger.info("Uploading audio file...")
+        job.upload_files(file_paths=[audio_path])
+        job.start()
 
-        transcript_id = self._start_transcription(upload_url)
+        logger.info("Waiting for transcription to complete...")
+        job.wait_until_complete()
 
-        logger.info("Waiting for transcription...")
+        # Get results
+        file_results = job.get_file_results()
 
-        data = self._poll(transcript_id)
+        if not file_results["successful"]:
+            error = file_results["failed"][0]["error_message"]
+            raise RuntimeError(f"Sarvam transcription failed: {error}")
 
-        logger.info("Transcription complete")
+        # Download output JSON to temp folder
+        job.download_outputs(output_dir="./transcripts/sarvam_raw")
+
+        logger.info("Transcription complete, formatting output...")
+
+        # Read the downloaded JSON output
+        import json
+        import glob
+        output_files = glob.glob("./transcripts/sarvam_raw/*.json")
+        with open(output_files[0], encoding="utf-8") as f:
+            data = json.load(f)
 
         return self._format_output(data)
 
-    def _upload_audio(self, audio_path):
-
-        with open(audio_path, "rb") as f:
-
-            response = requests.post(
-                f"{BASE_URL}/upload",
-                headers={"authorization": ASSEMBLYAI_API_KEY},
-                data=f
-            )
-
-        response.raise_for_status()
-
-        return response.json()["upload_url"]
-
-    def _start_transcription(self, upload_url):
-
-        payload = {
-            "audio_url": upload_url,
-            "speaker_labels": True,
-            "auto_chapters": False
-        }
-
-        response = requests.post(
-            f"{BASE_URL}/transcript",
-            headers=self.headers,
-            json=payload
-        )
-
-        response.raise_for_status()
-
-        return response.json()["id"]
-
-    def _poll(self, transcript_id):
-
-        while True:
-
-            response = requests.get(
-                f"{BASE_URL}/transcript/{transcript_id}",
-                headers=self.headers
-            )
-
-            response.raise_for_status()
-
-            data = response.json()
-
-            if data["status"] == "completed":
-                return data
-
-            if data["status"] == "error":
-                raise RuntimeError(data["error"])
-
-            time.sleep(3)
-
-    def _format_output(self, data):
+    def _format_output(self, data: dict) -> dict:
+        """
+        Map Sarvam's diarized_transcript to your internal format:
+        { "segments": [...], "metrics": {...} }
+        """
 
         segments = []
 
-        for u in data["utterances"]:
+        # Sarvam diarization output format (from official docs)
+        entries = (
+            data.get("diarized_transcript", {}).get("entries", [])
+        )
 
+        for entry in entries:
             segments.append({
-
-                "speaker": f"Speaker {u['speaker']}",
-
-                "start": u["start"] / 1000,
-
-                "end": u["end"] / 1000,
-
-                "text": u["text"]
-
+                "speaker": f"Speaker {entry.get('speaker_id', '0')}",
+                "start": float(entry.get("start_time_seconds", 0)),
+                "end": float(entry.get("end_time_seconds", 0)),
+                "text": entry.get("transcript", "")
             })
 
         word_count = sum(len(s["text"].split()) for s in segments)
+        duration = segments[-1]["end"] if segments else 0.0
 
-        duration = segments[-1]["end"] if segments else 0
-
-        transcript = {
-
+        return {
             "segments": segments,
-
             "metrics": {
-
                 "word_count": word_count,
-
                 "duration": duration,
-
                 "avg_confidence": 0.95
-
             }
-
         }
-
-        return transcript
