@@ -1,0 +1,2947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload & Transcribe - InsightFlow AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0A0F1F;
+            color: #E2E8F0;
+            overflow-x: hidden;
+        }
+
+        :root {
+            --bg-deep: #0A0F1F;
+            --bg-dark: #141B2B;
+            --bg-card: #1A2335;
+            --bg-elevated: #222D42;
+            --bg-hover: #2A374F;
+            --accent-primary: #6366F1;
+            --accent-secondary: #8B5CF6;
+            --accent-tertiary: #3B82F6;
+            --accent-glow: #A78BFA;
+            --accent-success: #10B981;
+            --accent-warning: #F59E0B;
+            --accent-danger: #EF4444;
+            --text-primary: #F1F5F9;
+            --text-secondary: #CBD5E1;
+            --text-muted: #94A3B8;
+            --border-light: #2D3748;
+            --border-medium: #3A4559;
+            --gradient-primary: linear-gradient(135deg, #6366F1, #8B5CF6);
+            --gradient-secondary: linear-gradient(135deg, #8B5CF6, #3B82F6);
+            --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5);
+            --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.6);
+            --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.7);
+        }
+
+        /* ========== DASHBOARD CONTAINER ========== */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+            background: var(--bg-deep);
+            position: relative;
+        }
+
+        .dashboard-container::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+
+        /* ========== SIDEBAR ========== */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-dark);
+            border-right: 1px solid var(--border-light);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 24px 0;
+            box-shadow: var(--shadow-sm);
+            z-index: 10;
+            transition: width 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .sidebar.collapsed .logo-text,
+        .sidebar.collapsed .user-profile-mini span,
+        .sidebar.collapsed .user-profile-mini small,
+        .sidebar.collapsed .nav-text,
+        .sidebar.collapsed .sidebar-footer span {
+            display: none;
+        }
+
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 12px 0;
+        }
+
+        .sidebar.collapsed .nav-icon {
+            margin-right: 0;
+            font-size: 20px;
+        }
+
+        .sidebar.collapsed .user-profile-mini i {
+            margin-right: 0;
+            font-size: 24px;
+        }
+
+        .sidebar.collapsed .logo {
+            justify-content: center;
+            padding: 0 10px;
+        }
+
+        .sidebar.collapsed .logo-icon {
+            margin-right: 0;
+        }
+
+        .toggle-sidebar-btn {
+            position: absolute;
+            right: -12px;
+            top: 70px;
+            width: 24px;
+            height: 24px;
+            background: var(--accent-primary);
+            border: 2px solid var(--bg-dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            color: white;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-sidebar-btn:hover {
+            background: var(--accent-glow);
+            transform: scale(1.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 24px;
+            margin-bottom: 32px;
+            transition: all 0.3s ease;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--gradient-primary);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+            flex-shrink: 0;
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            white-space: nowrap;
+        }
+
+        .user-profile-mini {
+            padding: 16px 20px;
+            margin: 0 16px 24px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .user-profile-mini i {
+            color: var(--accent-primary);
+            margin-right: 10px;
+            font-size: 18px;
+        }
+
+        .user-profile-mini span {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .user-profile-mini small {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            margin-left: 28px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 16px;
+        }
+
+        .nav-item {
+            margin: 4px 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 14px;
+            transition: all 0.2s ease;
+            gap: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .nav-link:hover {
+            background: var(--bg-hover);
+            color: var(--accent-glow);
+        }
+
+        .nav-link.active {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+        }
+
+        .nav-icon {
+            width: 22px;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .nav-text {
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-footer {
+            padding: 24px 20px;
+            border-top: 1px solid var(--border-light);
+            margin-top: 20px;
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            border: 1px solid var(--border-light);
+            border-radius: 14px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-danger);
+            border-color: var(--accent-danger);
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 24px 32px;
+            position: relative;
+            z-index: 1;
+            transition: margin-left 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .main-content.expanded {
+            margin-left: 80px;
+        }
+
+        /* ========== HEADER ========== */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            background: var(--bg-dark);
+            padding: 16px 24px;
+            border-radius: 20px;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .menu-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .menu-toggle:hover {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .header-left h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-left h1 i {
+            color: var(--accent-primary);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .notifications {
+            position: relative;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            background: var(--bg-card);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-light);
+        }
+
+        .notifications i {
+            font-size: 18px;
+            color: var(--text-secondary);
+        }
+
+        .badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--accent-danger);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .user-profile {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 2px solid var(--accent-primary);
+        }
+
+        .user-profile img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* ========== STATS CARDS ========== */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover::before {
+            transform: translateX(0);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.2);
+        }
+
+        .stat-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--gradient-primary);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 26px;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .stat-info h3 {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .stat-desc {
+            font-size: 12px;
+            color: var(--accent-success);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ========== CONTENT GRID ========== */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        /* ========== UPLOAD CARD ========== */
+        .upload-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 28px;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .upload-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .upload-header h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .upload-header h2 i {
+            color: var(--accent-primary);
+        }
+
+        .clear-btn {
+            padding: 6px 16px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: 30px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .clear-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-danger);
+            border-color: var(--accent-danger);
+        }
+
+        /* Upload Area */
+        .upload-area {
+            background: var(--bg-elevated);
+            border: 2px dashed var(--border-medium);
+            border-radius: 20px;
+            padding: 48px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .upload-area:hover {
+            border-color: var(--accent-primary);
+            background: rgba(99, 102, 241, 0.1);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 80px;
+            color: var(--accent-primary);
+            margin-bottom: 16px;
+            opacity: 0.9;
+            filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.3));
+        }
+
+        .upload-area h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .upload-area p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .browse-btn {
+            background: var(--gradient-primary);
+            border: none;
+            padding: 12px 28px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .browse-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(99, 102, 241, 0.5);
+        }
+
+        .file-info {
+            margin-top: 16px;
+            padding: 10px 16px;
+            background: var(--bg-dark);
+            border-radius: 40px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--text-primary);
+            border: 1px solid var(--border-light);
+        }
+
+        .file-info i {
+            color: var(--accent-success);
+        }
+
+        /* URL Input Section */
+        .url-input-section {
+            background: var(--bg-elevated);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid var(--border-light);
+        }
+
+        .url-input-section h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .url-input-section h4 i {
+            color: var(--accent-primary);
+        }
+
+        .url-input-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .url-input {
+            flex: 1;
+            padding: 12px 16px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-light);
+            border-radius: 40px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .url-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Language Settings */
+        .language-settings {
+            background: var(--bg-elevated);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid var(--border-light);
+        }
+
+        .language-settings h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .language-settings h4 i {
+            color: var(--accent-primary);
+        }
+
+        .language-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .language-select-wrapper {
+            flex: 2;
+            min-width: 200px;
+        }
+
+        .language-select {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-light);
+            border-radius: 40px;
+            color: var(--text-primary);
+            font-size: 14px;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+        }
+
+        .language-select:focus {
+            border-color: var(--accent-primary);
+            outline: none;
+        }
+
+        .auto-detect-toggle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: var(--bg-dark);
+            border-radius: 40px;
+            border: 1px solid var(--border-light);
+        }
+
+        .auto-detect-toggle input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-primary);
+            cursor: pointer;
+        }
+
+        .auto-detect-toggle label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .auto-detect-badge {
+            background: var(--accent-success);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 10px;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .primary-btn {
+            flex: 1;
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .primary-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(99, 102, 241, 0.5);
+        }
+
+        .primary-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .secondary-btn {
+            flex: 1;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            padding: 14px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .secondary-btn:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-primary);
+            color: var(--accent-glow);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: var(--bg-elevated);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-light);
+        }
+
+        .progress-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .progress-status i {
+            color: var(--accent-primary);
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-dark);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-percent {
+            text-align: right;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 8px;
+            color: var(--accent-primary);
+        }
+
+        /* ========== RIGHT COLUMN ========== */
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Recent Card */
+        .recent-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .recent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .recent-header h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .recent-header h2 i {
+            color: var(--accent-primary);
+        }
+
+        .view-all {
+            color: var(--accent-primary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 6px 14px;
+            background: var(--bg-elevated);
+            border-radius: 30px;
+            transition: all 0.2s ease;
+        }
+
+        .view-all:hover {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .recent-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .recent-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg-elevated);
+            border-radius: 16px;
+            transition: all 0.2s ease;
+            position: relative;
+            border: 1px solid transparent;
+        }
+
+        .recent-item:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-primary);
+            transform: translateX(5px);
+        }
+
+        .recent-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            flex-shrink: 0;
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.3);
+        }
+
+        .recent-details {
+            flex: 1;
+            min-width: 0;
+            cursor: pointer;
+        }
+
+        .recent-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .recent-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .recent-meta i {
+            color: var(--accent-primary);
+        }
+
+        .language-badge {
+            padding: 4px 10px;
+            background: var(--bg-dark);
+            color: var(--accent-primary);
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 600;
+            flex-shrink: 0;
+            border: 1px solid var(--border-light);
+        }
+
+        /* Recent Actions Menu */
+        .recent-actions-menu {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: none;
+            gap: 6px;
+            background: var(--bg-card);
+            padding: 6px;
+            border-radius: 40px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-light);
+            z-index: 10;
+        }
+
+        .recent-item:hover .recent-actions-menu {
+            display: flex;
+        }
+
+        .action-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--bg-elevated);
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .action-icon:hover {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .action-icon.delete:hover {
+            background: var(--accent-danger);
+        }
+
+        /* Quick Access Card */
+        .quick-access-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .quick-header h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .quick-header h2 i {
+            color: var(--accent-primary);
+        }
+
+        .quick-modules-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .module-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-primary);
+            background: var(--bg-hover);
+            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.2);
+        }
+
+        .module-icon {
+            font-size: 24px;
+            color: var(--accent-primary);
+            margin-bottom: 8px;
+        }
+
+        .module-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* ========== RESULTS CARD ========== */
+        .results-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 28px;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+            margin-top: 24px;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-light);
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .results-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .results-header h2 i {
+            color: var(--accent-primary);
+        }
+
+        .results-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 8px 18px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: 40px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: var(--gradient-primary);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px);
+        }
+
+        .download-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: var(--bg-dark);
+            min-width: 140px;
+            border-radius: 16px;
+            z-index: 10;
+            margin-top: 8px;
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .download-dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content button {
+            width: 100%;
+            padding: 10px 16px;
+            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-content button:hover {
+            background: var(--bg-hover);
+            color: var(--accent-glow);
+        }
+
+        /* Audio Player */
+        .audio-player {
+            background: var(--bg-elevated);
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            border: 1px solid var(--border-light);
+        }
+
+        .audio-player audio {
+            flex: 1;
+            min-width: 200px;
+            height: 40px;
+        }
+
+        .playback-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .speed-btn {
+            padding: 6px 12px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-light);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .speed-btn:hover, .speed-btn.active {
+            background: var(--accent-primary);
+            color: white;
+            border-color: transparent;
+        }
+
+        /* Tabs */
+        .quick-modules-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .module-btn {
+            padding: 10px 20px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: 40px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .module-btn:hover, .module-btn.active {
+            background: var(--gradient-primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Language Info Bar */
+        .language-info-bar {
+            background: var(--bg-elevated);
+            border-radius: 16px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            border: 1px solid var(--border-light);
+        }
+
+        .lang-info-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .lang-info-item i {
+            color: var(--accent-primary);
+        }
+
+        .lang-info-item span {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .lang-info-item strong {
+            color: var(--accent-success);
+        }
+
+        /* Transcript Content */
+        .transcript-content {
+            background: var(--bg-elevated);
+            border-radius: 20px;
+            padding: 24px;
+            max-height: 500px;
+            overflow-y: auto;
+            margin: 20px 0;
+            border: 1px solid var(--border-light);
+        }
+
+        .speaker-block {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: var(--bg-dark);
+            border-radius: 16px;
+            border-left: 4px solid var(--accent-primary);
+            transition: all 0.2s ease;
+        }
+
+        .speaker-block:hover {
+            transform: translateX(5px);
+        }
+
+        .speaker-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+            color: var(--accent-primary);
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .speaker-text {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            font-size: 14px;
+        }
+
+        /* Word and Sentence Styling */
+        .word {
+            display: inline-block;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            padding: 2px 0;
+            border-radius: 4px;
+        }
+
+        .word:hover {
+            background: rgba(99, 102, 241, 0.3);
+            transform: scale(1.05);
+        }
+
+        .sentence {
+            display: inline;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            line-height: 1.8;
+        }
+
+        .sentence:hover {
+            background: rgba(99, 102, 241, 0.2);
+        }
+
+        .word.highlight-yellow, .sentence.highlight-yellow {
+            background: rgba(245, 158, 11, 0.4);
+            border-radius: 4px;
+        }
+
+        .word.highlight-green, .sentence.highlight-green {
+            background: rgba(16, 185, 129, 0.4);
+            border-radius: 4px;
+        }
+
+        .word.highlight-red, .sentence.highlight-red {
+            background: rgba(239, 68, 68, 0.4);
+            border-radius: 4px;
+        }
+
+        .timestamp {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 12px;
+            text-align: right;
+        }
+
+        /* Action Buttons Group */
+        .action-buttons-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .icon-btn {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            padding: 6px 12px;
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn:hover {
+            background: var(--accent-primary);
+            color: white;
+            border-color: transparent;
+        }
+
+        /* Transcript Stats */
+        .transcript-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .stat-item-small {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg-elevated);
+            border-radius: 16px;
+            border: 1px solid var(--border-light);
+            transition: all 0.2s ease;
+        }
+
+        .stat-item-small:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-3px);
+        }
+
+        .stat-icon-small {
+            width: 44px;
+            height: 44px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .stat-info-small {
+            flex: 1;
+        }
+
+        .stat-label-small {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .stat-value-small {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .transcript-placeholder {
+            background: var(--bg-elevated);
+            border-radius: 20px;
+            padding: 60px 30px;
+            text-align: center;
+            color: var(--text-muted);
+            border: 2px dashed var(--border-medium);
+            margin: 20px 0;
+        }
+
+        .transcript-placeholder i {
+            font-size: 60px;
+            color: var(--border-medium);
+            margin-bottom: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 40px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        /* Translation Panel */
+        .translation-panel {
+            background: var(--bg-elevated);
+            border-radius: 20px;
+            padding: 24px;
+        }
+
+        .translation-panel h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .translation-select {
+            width: 100%;
+            padding: 14px 18px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            color: var(--text-primary);
+            font-size: 14px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 18px center;
+        }
+
+        .translate-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 16px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .translate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .translation-result {
+            margin-top: 20px;
+            padding: 20px;
+            background: var(--bg-dark);
+            border-radius: 16px;
+            border: 1px solid var(--border-light);
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        }
+        
+        .modal-container {
+            background: var(--bg-card);
+            border-radius: 28px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.3s ease;
+        }
+
+        .all-transcripts-modal {
+            max-width: 800px;
+        }
+        
+        .modal-header {
+            padding: 24px 28px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .modal-header h3 i {
+            color: var(--accent-primary);
+        }
+        
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .modal-close:hover {
+            background: var(--accent-danger);
+            color: white;
+            border-color: var(--accent-danger);
+        }
+        
+        .modal-body {
+            padding: 28px;
+        }
+
+        .transcripts-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .transcript-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: var(--bg-elevated);
+            border-radius: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .transcript-item:hover {
+            background: var(--bg-hover);
+            transform: translateX(5px);
+        }
+        
+        .color-options {
+            display: flex;
+            gap: 16px;
+            margin: 20px 0;
+        }
+        
+        .color-option {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 3px solid transparent;
+        }
+        
+        .color-option:hover { transform: scale(1.1); }
+        .color-option.selected { border-color: white; transform: scale(1.05); }
+        .color-yellow { background: rgba(245, 158, 11, 0.3); border: 2px solid #F59E0B; }
+        .color-green { background: rgba(16, 185, 129, 0.3); border: 2px solid #10B981; }
+        .color-red { background: rgba(239, 68, 68, 0.3); border: 2px solid #EF4444; }
+
+        .highlight-type {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .type-btn {
+            flex: 1;
+            padding: 12px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-light);
+            border-radius: 40px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .type-btn.active {
+            background: var(--accent-primary);
+            color: white;
+        }
+        
+        .modal-input, .modal-textarea {
+            width: 100%;
+            padding: 14px 18px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 14px;
+            margin-bottom: 20px;
+            transition: all 0.2s ease;
+        }
+        
+        .modal-input:focus, .modal-textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+        
+        .modal-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        
+        .modal-btn-primary {
+            flex: 1;
+            padding: 14px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .modal-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4); }
+        
+        .modal-btn-secondary {
+            flex: 1;
+            padding: 14px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: 40px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .modal-btn-secondary:hover { background: var(--bg-hover); border-color: var(--accent-danger); color: var(--accent-danger); }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes slideOutRight {
+            from { opacity: 1; transform: translateX(0); }
+            to { opacity: 0; transform: translateX(100px); }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-primary);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-glow);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .transcript-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 16px;
+            }
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            .menu-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+            .transcript-stats {
+                grid-template-columns: 1fr;
+            }
+            .recent-actions-menu {
+                position: static;
+                transform: none;
+                justify-content: flex-end;
+                margin-top: 8px;
+            }
+            .recent-item {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HTML content continues here -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="toggle-sidebar-btn" id="toggleSidebar"><i class="fas fa-chevron-left"></i></div>
+            <div class="logo">
+                <div class="logo-icon"><i class="fas fa-brain"></i></div>
+                <span class="logo-text">InsightFlow AI</span>
+            </div>
+            <div class="user-profile-mini">
+                <i class="fas fa-user-circle"></i>
+                <span id="userName">Loading...</span>
+                <small id="userRole">AI Analyst</small>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/dashboard" class="nav-link">
+                        <i class="fas fa-home nav-icon"></i>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/live-transcription" class="nav-link">
+                        <i class="fas fa-microphone-alt nav-icon"></i>
+                        <span class="nav-text">Live Transcription</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/upload-transcribe" class="nav-link active">
+                        <i class="fas fa-upload nav-icon"></i>
+                        <span class="nav-text">Upload & Transcribe</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/summarization" class="nav-link">
+                        <i class="fas fa-file-alt nav-icon"></i>
+                        <span class="nav-text">Summarization</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/my-tasks" class="nav-link">
+                        <i class="fas fa-tasks nav-icon"></i>
+                        <span class="nav-text">My Tasks</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/speaker-identification" class="nav-link">
+                        <i class="fas fa-user-friends nav-icon"></i>
+                        <span class="nav-text">Speaker Identification</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/sentiment-analysis" class="nav-link">
+                        <i class="fas fa-smile nav-icon"></i>
+                        <span class="nav-text">Sentiment Analysis</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/translation" class="nav-link">
+                        <i class="fas fa-language nav-icon"></i>
+                        <span class="nav-text">Translation</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/files-history" class="nav-link">
+                        <i class="fas fa-folder-open nav-icon"></i>
+                        <span class="nav-text">Files / History</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/analytics" class="nav-link">
+                        <i class="fas fa-chart-line nav-icon"></i>
+                        <span class="nav-text">Analytics & Reports</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/calendar" class="nav-link">
+                        <i class="fas fa-calendar-alt nav-icon"></i>
+                        <span class="nav-text">Calendar Integration</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/profile" class="nav-link">
+                        <i class="fas fa-cog nav-icon"></i>
+                        <span class="nav-text">Settings / Profile</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i><span>Logout</span></button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+                    <h1><i class="fas fa-upload"></i> Upload & Transcribe</h1>
+                </div>
+                <div class="header-right">
+                    <div class="notifications"><i class="fas fa-bell"></i><span class="badge" id="notificationBadge">0</span></div>
+                    <div class="user-profile"><img id="profileImage" src="https://ui-avatars.com/api/?name=User&background=6366F1&color=fff" alt="Profile"></div>
+                </div>
+            </header>
+
+            <!-- Stats Cards -->
+            <div class="stats-row">
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-file-alt"></i></div><div class="stat-info"><h3>Files Processed</h3><div class="stat-number" id="totalFiles">0</div><div class="stat-desc">Total transcripts</div></div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-clock"></i></div><div class="stat-info"><h3>Total Duration</h3><div class="stat-number" id="totalDuration">0</div><div class="stat-desc">Minutes processed</div></div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-language"></i></div><div class="stat-info"><h3>Languages</h3><div class="stat-number" id="totalLanguages">0</div><div class="stat-desc">Supported</div></div></div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="content-grid">
+                <div class="upload-card">
+                    <div class="upload-header"><h2><i class="fas fa-cloud-upload-alt"></i> Upload Media</h2><button class="clear-btn" onclick="clearAll()"><i class="fas fa-trash-alt"></i> Clear</button></div>
+                    
+                    <!-- File Upload Area -->
+                    <div class="upload-area" id="uploadContainer">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <h3>Drag & Drop Files</h3>
+                        <p>MP3, WAV, M4A, MP4 (max 100MB)</p>
+                        <input type="file" id="audioFile" accept="audio/*,video/*" hidden>
+                        <button class="browse-btn" id="browseBtn"><i class="fas fa-folder-open"></i> Browse Files</button>
+                        <div class="file-info" id="fileInfo"></div>
+                    </div>
+
+                    <!-- YouTube/Link Input -->
+                    <div class="url-input-section">
+                        <h4><i class="fab fa-youtube"></i> External Links</h4>
+                        <div class="url-input-group">
+                            <input type="text" class="url-input" id="externalUrl" placeholder="Paste YouTube URL or audio/video link...">
+                            <button class="browse-btn" onclick="processExternalUrl()" style="padding: 12px 24px;"><i class="fas fa-link"></i> Process</button>
+                        </div>
+                    </div>
+
+                    <!-- Language Settings -->
+                    <div class="language-settings">
+                        <h4><i class="fas fa-language"></i> Language Settings</h4>
+                        <div class="language-row">
+                            <select class="language-select" id="languageSelect">
+                                <optgroup label="🇮🇳 Indian Languages">
+                                    <option value="hi">Hindi (हिन्दी)</option>
+                                    <option value="mr">Marathi (मराठी)</option>
+                                    <option value="ta">Tamil (தமிழ்)</option>
+                                    <option value="te">Telugu (తెలుగు)</option>
+                                    <option value="bn">Bengali (বাংলা)</option>
+                                    <option value="gu">Gujarati (ગુજરાતી)</option>
+                                    <option value="kn">Kannada (ಕನ್ನಡ)</option>
+                                    <option value="ml">Malayalam (മലയാളം)</option>
+                                    <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
+                                </optgroup>
+                                <optgroup label="🌍 International">
+                                    <option value="en">English</option>
+                                    <option value="es">Spanish</option>
+                                    <option value="fr">French</option>
+                                    <option value="de">German</option>
+                                    <option value="ja">Japanese</option>
+                                    <option value="zh">Chinese</option>
+                                </optgroup>
+                            </select>
+                            <div class="auto-detect-toggle">
+                                <input type="checkbox" id="autoDetect" checked>
+                                <label for="autoDetect">Auto-detect</label>
+                                <span class="auto-detect-badge">Best</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="primary-btn" id="transcribeBtn" onclick="startTranscription()" disabled><i class="fas fa-microphone-alt"></i> Transcribe</button>
+                        <button class="secondary-btn" onclick="cancelUpload()"><i class="fas fa-times"></i> Cancel</button>
+                    </div>
+
+                    <div class="progress-container" id="progressSection" style="display: none;">
+                        <div class="progress-status"><i class="fas fa-circle-notch fa-spin"></i><span id="progressStatus">Processing...</span></div>
+                        <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar" style="width: 0%"></div></div>
+                        <div class="progress-percent" id="progressPercentage">0%</div>
+                    </div>
+                </div>
+
+                <div class="right-column">
+                    <div class="recent-card">
+                        <div class="recent-header">
+                            <h2><i class="fas fa-history"></i> Recent Transcriptions</h2>
+                            <span class="view-all" onclick="showAllTranscripts()">View All <i class="fas fa-arrow-right"></i></span>
+                        </div>
+                        <div class="recent-list" id="recentTranscriptsList">
+                            <div class="empty-state"><i class="fas fa-file-audio"></i><p>Loading transcripts...</p></div>
+                        </div>
+                    </div>
+
+                    <div class="quick-access-card">
+                        <div class="quick-header"><h2><i class="fas fa-bolt"></i> Quick Access</h2></div>
+                        <div class="quick-modules-grid">
+                            <div class="module-card" onclick="location.href='/summarization'"><div class="module-icon"><i class="fas fa-file-alt"></i></div><div class="module-title">Summarization</div></div>
+                            <div class="module-card" onclick="location.href='/my-tasks'"><div class="module-icon"><i class="fas fa-tasks"></i></div><div class="module-title">Action Items</div></div>
+                            <div class="module-card" onclick="location.href='/sentiment-analysis'"><div class="module-icon"><i class="fas fa-smile"></i></div><div class="module-title">Sentiment</div></div>
+                            <div class="module-card" onclick="location.href='/translation'"><div class="module-icon"><i class="fas fa-language"></i></div><div class="module-title">Translate</div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transcription Results -->
+            <div class="results-card">
+                <div class="results-header">
+                    <h2><i class="fas fa-file-alt"></i> Transcription Results</h2>
+                    <div class="results-actions" id="resultsActions" style="display: none;">
+                        <button class="action-btn" onclick="copyTranscript()"><i class="fas fa-copy"></i> Copy</button>
+                        <button class="action-btn" onclick="shareTranscript()"><i class="fas fa-share-alt"></i> Share</button>
+                        <div class="download-dropdown">
+                            <button class="action-btn"><i class="fas fa-download"></i> Download</button>
+                            <div class="dropdown-content">
+                                <button onclick="exportAs('txt')"><i class="fas fa-file-alt"></i> TXT</button>
+                                <button onclick="exportAs('srt')"><i class="fas fa-closed-captioning"></i> SRT</button>
+                                <button onclick="exportAs('json')"><i class="fas fa-code"></i> JSON</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Audio Player -->
+                <div class="audio-player" id="audioPlayer" style="display: none;">
+                    <i class="fas fa-headphones" style="color: var(--accent-primary); font-size: 24px;"></i>
+                    <audio id="transcriptAudio" controls></audio>
+                    <div class="playback-controls">
+                        <button class="speed-btn" onclick="setPlaybackSpeed(0.5)">0.5x</button>
+                        <button class="speed-btn active" onclick="setPlaybackSpeed(1)">1x</button>
+                        <button class="speed-btn" onclick="setPlaybackSpeed(1.5)">1.5x</button>
+                        <button class="speed-btn" onclick="setPlaybackSpeed(2)">2x</button>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="quick-modules-row" id="quickModules" style="display: none;">
+                    <button class="module-btn tab-btn active" onclick="switchTab('transcript')"><i class="fas fa-file-alt"></i> Transcript</button>
+                    <button class="module-btn tab-btn" onclick="switchTab('speakers')"><i class="fas fa-user-friends"></i> Speakers</button>
+                    <button class="module-btn tab-btn" onclick="switchTab('highlights')"><i class="fas fa-highlighter"></i> Highlights</button>
+                    <button class="module-btn tab-btn" onclick="switchTab('notes')"><i class="fas fa-sticky-note"></i> Notes</button>
+                    <button class="module-btn tab-btn" onclick="switchTab('translate')"><i class="fas fa-language"></i> Translate</button>
+                </div>
+
+                <!-- Transcript Tab -->
+                <div id="tab-transcript" class="tab-content active">
+                    <div class="language-info-bar" id="languageInfoBar" style="display: none;">
+                        <div class="lang-info-item"><i class="fas fa-microphone"></i><span>Detected: <strong id="detectedLanguage">English</strong></span></div>
+                        <div class="lang-info-item"><i class="fas fa-check-circle"></i><span>Confidence: <strong id="languageConfidence">98%</strong></span></div>
+                        <div class="lang-info-item"><i class="fas fa-clock"></i><span>Duration: <strong id="durationDisplay">00:00</strong></span></div>
+                    </div>
+                    <div class="transcript-placeholder" id="transcriptPlaceholder">
+                        <i class="fas fa-file-audio"></i>
+                        <p>Your AI-generated transcription will appear here after processing.</p>
+                        <p style="font-size: 14px; margin-top: 10px;">Click on any word or sentence to highlight it</p>
+                    </div>
+                    <div id="transcriptDisplay" style="display: none;">
+                        <div class="transcript-content" id="transcriptContent"></div>
+                        <div class="transcript-stats">
+                            <div class="stat-item-small"><div class="stat-icon-small"><i class="fas fa-users"></i></div><div><div class="stat-label-small">Speakers</div><div class="stat-value-small" id="totalSpeakers">0</div></div></div>
+                            <div class="stat-item-small"><div class="stat-icon-small"><i class="fas fa-font"></i></div><div><div class="stat-label-small">Total Words</div><div class="stat-value-small" id="totalWords">0</div></div></div>
+                            <div class="stat-item-small"><div class="stat-icon-small"><i class="fas fa-clock"></i></div><div><div class="stat-label-small">Duration</div><div class="stat-value-small" id="statsDuration">00:00</div></div></div>
+                            <div class="stat-item-small"><div class="stat-icon-small"><i class="fas fa-language"></i></div><div><div class="stat-label-small">Language</div><div class="stat-value-small" id="displayLanguage">English</div></div></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-speakers" class="tab-content"><div class="translation-panel"><h4><i class="fas fa-user-friends"></i> Speaker Statistics</h4><div id="speakerList"></div></div></div>
+                <div id="tab-highlights" class="tab-content"><div class="translation-panel"><h4><i class="fas fa-highlighter"></i> Saved Highlights</h4><div id="highlightsList"></div></div></div>
+                <div id="tab-notes" class="tab-content"><div class="translation-panel"><h4><i class="fas fa-sticky-note"></i> Notes</h4><div id="notesList"></div></div></div>
+                <div id="tab-translate" class="tab-content">
+                    <div class="translation-panel">
+                        <h4><i class="fas fa-language"></i> Translation</h4>
+                        <select class="translation-select" id="translateTargetLang">
+                            <optgroup label="🇮🇳 Indian Languages">
+                                <option value="hi">Hindi (हिन्दी)</option>
+                                <option value="mr">Marathi (मराठी)</option>
+                                <option value="ta">Tamil (தமிழ்)</option>
+                                <option value="te">Telugu (తెలుగు)</option>
+                                <option value="bn">Bengali (বাংলা)</option>
+                                <option value="gu">Gujarati (ગુજરાતી)</option>
+                                <option value="kn">Kannada (ಕನ್ನಡ)</option>
+                                <option value="ml">Malayalam (മലയാളം)</option>
+                            </optgroup>
+                            <optgroup label="🌍 International">
+                                <option value="en">English</option>
+                                <option value="es">Spanish</option>
+                                <option value="fr">French</option>
+                                <option value="de">German</option>
+                                <option value="ja">Japanese</option>
+                                <option value="zh">Chinese</option>
+                            </optgroup>
+                        </select>
+                        <button class="translate-btn" onclick="translateFullTranscript()"><i class="fas fa-language"></i> Translate Full Transcript</button>
+                        <div id="translationResult" class="translation-result" style="display: none;"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ========== SIDEBAR TOGGLE ==========
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const toggleBtn = document.getElementById('toggleSidebar');
+        const menuToggle = document.getElementById('menuToggle');
+
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            sidebar.classList.add('collapsed');
+            mainContent.classList.add('expanded');
+            toggleBtn.querySelector('i').classList.replace('fa-chevron-left', 'fa-chevron-right');
+        }
+
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+            const icon = toggleBtn.querySelector('i');
+            if (sidebar.classList.contains('collapsed')) {
+                icon.classList.replace('fa-chevron-left', 'fa-chevron-right');
+                localStorage.setItem('sidebarCollapsed', 'true');
+            } else {
+                icon.classList.replace('fa-chevron-right', 'fa-chevron-left');
+                localStorage.setItem('sidebarCollapsed', 'false');
+            }
+        });
+
+        menuToggle.addEventListener('click', () => sidebar.classList.toggle('mobile-open'));
+
+        // ========== GLOBAL VARIABLES ==========
+        let selectedFile = null;
+        let currentTranscript = null;
+        let currentTranscriptId = null;
+        let currentHighlights = [];
+        let currentNotes = [];
+        let currentTranslation = null;
+        let currentAudioUrl = null;
+        let currentPlaybackSpeed = 1;
+
+        // ========== AUDIO PLAYBACK ==========
+        function setPlaybackSpeed(speed) {
+            currentPlaybackSpeed = speed;
+            const audio = document.getElementById('transcriptAudio');
+            if (audio) audio.playbackRate = speed;
+            document.querySelectorAll('.speed-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // ========== EXTERNAL URL PROCESSING ==========
+        function processExternalUrl() {
+            const url = document.getElementById('externalUrl').value.trim();
+            if (!url) {
+                showNotification('Please enter a URL', 'error');
+                return;
+            }
+
+            // YouTube URL detection
+            const youtubeRegex = /(youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/;
+            const match = url.match(youtubeRegex);
+            
+            if (match) {
+                showNotification('YouTube processing coming soon! Please upload file directly for now.', 'info');
+            } else {
+                const audioExt = url.match(/\.(mp3|wav|m4a|mp4)$/i);
+                if (audioExt) {
+                    currentAudioUrl = url;
+                    const fileName = url.split('/').pop() || 'external_audio';
+                    simulateTranscription(fileName);
+                } else {
+                    showNotification('Please provide a direct audio file URL or YouTube link', 'error');
+                }
+            }
+        }
+
+        function simulateTranscription(fileName) {
+            showNotification('Processing external URL...', 'info');
+            setTimeout(() => {
+                const mockTranscript = {
+                    segments: [
+                        { speaker: 'Speaker A', text: 'This is a sample transcription from the external URL.', start: 0, end: 5000 },
+                        { speaker: 'Speaker B', text: 'The system will process your audio file and provide accurate transcription.', start: 5000, end: 10000 },
+                        { speaker: 'Speaker A', text: 'Multiple languages are supported including Hindi, Marathi, Tamil, and more.', start: 10000, end: 15000 }
+                    ],
+                    metadata: { language: 'en', language_name: 'English', confidence: 0.95, total_words: 45 }
+                };
+                currentTranscript = mockTranscript;
+                currentTranscriptId = Date.now();
+                displayTranscript(mockTranscript, 'English');
+                showNotification('Transcription completed!', 'success');
+                loadTranscripts();
+            }, 2000);
+        }
+
+        // ========== WORD/SENTENCE HIGHLIGHTING ==========
+        function showHighlightModal(selectedText, element, isWord = true) {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-container">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-highlighter"></i> Highlight Text</h3>
+                        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="modal-body">
+                        <p style="margin-bottom: 16px;">Select highlight type:</p>
+                        <div class="highlight-type">
+                            <button class="type-btn active" data-type="word">Word</button>
+                            <button class="type-btn" data-type="sentence">Sentence</button>
+                        </div>
+                        <p style="margin: 16px 0 8px;">Select color:</p>
+                        <div class="color-options">
+                            <div class="color-option color-yellow" data-color="yellow"></div>
+                            <div class="color-option color-green" data-color="green"></div>
+                            <div class="color-option color-red" data-color="red"></div>
+                        </div>
+                        <div style="background: var(--bg-dark); padding: 16px; border-radius: 16px; margin: 20px 0;">
+                            <p style="color: var(--text-muted); margin-bottom: 8px;">Text to highlight:</p>
+                            <p style="color: var(--text-primary);">${escapeHtml(selectedText)}</p>
+                        </div>
+                        <div class="modal-buttons">
+                            <button class="modal-btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+                            <button class="modal-btn-primary" id="confirmHighlight">Apply Highlight</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            let selectedColor = 'yellow';
+            let highlightType = 'word';
+
+            document.querySelectorAll('.color-option').forEach(opt => {
+                opt.addEventListener('click', () => {
+                    document.querySelectorAll('.color-option').forEach(o => o.classList.remove('selected'));
+                    opt.classList.add('selected');
+                    selectedColor = opt.dataset.color;
+                });
+            });
+            document.querySelector('.color-yellow').classList.add('selected');
+
+            document.querySelectorAll('.type-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    highlightType = btn.dataset.type;
+                });
+            });
+
+            document.getElementById('confirmHighlight').onclick = () => {
+                applyHighlight(element, selectedText, selectedColor, highlightType);
+                modal.remove();
+            };
+        }
+
+        function applyHighlight(element, text, color, type) {
+            if (type === 'word') {
+                element.classList.add(`highlight-${color}`);
+                const highlight = {
+                    id: Date.now(),
+                    type: 'word',
+                    text: text,
+                    color: color,
+                    timestamp: new Date().toISOString()
+                };
+                currentHighlights.push(highlight);
+                saveHighlightToStorage(highlight);
+            } else {
+                const sentence = element.closest('.sentence');
+                if (sentence) {
+                    sentence.classList.add(`highlight-${color}`);
+                    const highlight = {
+                        id: Date.now(),
+                        type: 'sentence',
+                        text: text,
+                        color: color,
+                        timestamp: new Date().toISOString()
+                    };
+                    currentHighlights.push(highlight);
+                    saveHighlightToStorage(highlight);
+                }
+            }
+            showNotification('Text highlighted!', 'success');
+        }
+
+        // ========== NOTE MODAL ==========
+        function showNoteModal(selectedText, element) {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-container">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-sticky-note"></i> Add Note</h3>
+                        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="modal-body">
+                        <div style="background: var(--bg-dark); padding: 16px; border-radius: 16px; margin-bottom: 20px;">
+                            <p style="color: var(--text-muted); margin-bottom: 8px;">Reference text:</p>
+                            <p style="color: var(--text-primary);">${escapeHtml(selectedText)}</p>
+                        </div>
+                        <textarea class="modal-textarea" id="noteContent" placeholder="Write your note here..." rows="4"></textarea>
+                        <div class="modal-buttons">
+                            <button class="modal-btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+                            <button class="modal-btn-primary" id="confirmNote">Add Note</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            document.getElementById('confirmNote').onclick = () => {
+                const noteText = document.getElementById('noteContent').value.trim();
+                if (noteText) {
+                    const note = {
+                        id: Date.now(),
+                        text: selectedText,
+                        note: noteText,
+                        timestamp: new Date().toISOString()
+                    };
+                    currentNotes.push(note);
+                    saveNoteToStorage(note);
+                    showNotification('Note added!', 'success');
+                    modal.remove();
+                } else {
+                    showNotification('Please enter a note', 'error');
+                }
+            };
+        }
+
+        // ========== DISPLAY TRANSCRIPT WITH WORD-LEVEL HIGHLIGHTING ==========
+        function displayTranscript(transcript, languageName = 'English') {
+            if (!transcript || !transcript.segments) return;
+
+            const transcriptContent = document.getElementById('transcriptContent');
+            let html = '';
+            let totalWordCount = 0;
+            const speakers = new Set();
+
+            transcript.segments.forEach((segment, index) => {
+                speakers.add(segment.speaker);
+                const words = segment.text.split(' ');
+                totalWordCount += words.length;
+
+                const sentences = segment.text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [segment.text];
+                
+                html += `
+                    <div class="speaker-block" id="segment-${index}">
+                        <div class="speaker-header">
+                            <i class="fas fa-user-circle"></i>
+                            <span>${segment.speaker}</span>
+                            <button class="icon-btn" onclick="renameSpeaker('${segment.speaker}')" style="margin-left: 8px; padding: 4px 8px;"><i class="fas fa-edit"></i></button>
+                        </div>
+                        <div class="speaker-text" id="text-${index}">
+                `;
+
+                sentences.forEach((sentence, sentIdx) => {
+                    const sentenceWords = sentence.trim().split(' ');
+                    html += `<span class="sentence" data-sentence="${sentIdx}" onclick="showHighlightModal('${escapeHtml(sentence.trim())}', this, false)" ondblclick="showNoteModal('${escapeHtml(sentence.trim())}', this)">`;
+                    sentenceWords.forEach((word, wordIdx) => {
+                        html += `<span class="word" data-word="${wordIdx}" onclick="event.stopPropagation(); showHighlightModal('${escapeHtml(word)}', this, true)" ondblclick="event.stopPropagation(); showNoteModal('${escapeHtml(word)}', this)">${escapeHtml(word)}</span> `;
+                    });
+                    html += `</span> `;
+                });
+
+                html += `
+                        </div>
+                        <div class="timestamp">${formatTime(segment.start)} - ${formatTime(segment.end)}</div>
+                        <div class="action-buttons-group">
+                            <button class="icon-btn" onclick="showNoteModal('${escapeHtml(segment.text).replace(/'/g, "\\'")}', this)"><i class="fas fa-sticky-note"></i> Add Note</button>
+                            <button class="icon-btn" onclick="translateSegment(${index})"><i class="fas fa-language"></i> Translate Segment</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            transcriptContent.innerHTML = html;
+
+            document.getElementById('totalSpeakers').textContent = speakers.size;
+            document.getElementById('totalWords').textContent = totalWordCount;
+            
+            const durationMinutes = Math.ceil(totalWordCount / 150);
+            const mins = Math.floor(durationMinutes);
+            const secs = (durationMinutes % 1) * 60;
+            const durationStr = `${mins}:${Math.floor(secs).toString().padStart(2, '0')}`;
+            document.getElementById('durationDisplay').textContent = durationStr;
+            document.getElementById('statsDuration').textContent = durationStr;
+            document.getElementById('displayLanguage').textContent = languageName;
+            document.getElementById('detectedLanguage').textContent = languageName;
+            
+            document.getElementById('transcriptPlaceholder').style.display = 'none';
+            document.getElementById('transcriptDisplay').style.display = 'block';
+            document.getElementById('resultsActions').style.display = 'flex';
+            document.getElementById('quickModules').style.display = 'flex';
+            document.getElementById('languageInfoBar').style.display = 'flex';
+            document.getElementById('audioPlayer').style.display = 'flex';
+        }
+
+        // ========== SHOW ALL TRANSCRIPTS MODAL ==========
+        async function showAllTranscripts() {
+            try {
+                const response = await fetch('/api/transcripts');
+                const data = await response.json();
+                if (!data.success || !data.transcripts) return;
+
+                const modal = document.createElement('div');
+                modal.className = 'modal-overlay';
+                modal.innerHTML = `
+                    <div class="modal-container all-transcripts-modal">
+                        <div class="modal-header">
+                            <h3><i class="fas fa-list"></i> All Transcriptions</h3>
+                            <button class="modal-close" onclick="this.closest('.modal-overlay').remove()"><i class="fas fa-times"></i></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="transcripts-list" id="allTranscriptsList">
+                                ${data.transcripts.map(t => `
+                                    <div class="transcript-item" onclick="loadTranscriptFromDB(${t.id}); this.closest('.modal-overlay').remove();">
+                                        <div class="recent-icon"><i class="fas fa-file-audio"></i></div>
+                                        <div class="recent-details">
+                                            <div class="recent-title">${escapeHtml(t.title || t.filename)}</div>
+                                            <div class="recent-meta">
+                                                <span><i class="fas fa-clock"></i> ${formatDuration(t.duration)}</span>
+                                                <span><i class="fas fa-user-friends"></i> ${t.speaker_count || 0}</span>
+                                                <span><i class="fas fa-calendar"></i> ${new Date(t.created_at).toLocaleDateString()}</span>
+                                            </div>
+                                        </div>
+                                        <span class="language-badge">${t.language_name || t.language || 'EN'}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+            } catch (error) {
+                showNotification('Failed to load transcripts', 'error');
+            }
+        }
+
+        // ========== HELPER FUNCTIONS ==========
+        function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m) { if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; return m; }); }
+        function formatDuration(seconds) { if(!seconds) return '00:00'; const mins = Math.floor(seconds / 60); const secs = Math.floor(seconds % 60); return `${mins}:${secs.toString().padStart(2,'0')}`; }
+        function formatTime(ms) { if(!ms) return '00:00'; const seconds = Math.floor(ms / 1000); const mins = Math.floor(seconds / 60); const secs = seconds % 60; return `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`; }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `position:fixed; top:20px; right:20px; background:${type === 'success' ? 'linear-gradient(135deg,#10B981,#34D399)' : 'linear-gradient(135deg,#EF4444,#F87171)'}; color:white; padding:12px 24px; border-radius:40px; z-index:9999; animation:slideInRight 0.3s ease;`;
+            notification.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${message}`;
+            document.body.appendChild(notification);
+            setTimeout(() => { notification.style.animation = 'slideOutRight 0.3s ease'; setTimeout(() => notification.remove(), 300); }, 3000);
+        }
+
+        // ========== FILE UPLOAD ==========
+        const uploadContainer = document.getElementById('uploadContainer');
+        const audioFile = document.getElementById('audioFile');
+        const browseBtn = document.getElementById('browseBtn');
+        const fileInfo = document.getElementById('fileInfo');
+        const transcribeBtn = document.getElementById('transcribeBtn');
+
+        browseBtn.addEventListener('click', (e) => { e.stopPropagation(); audioFile.click(); });
+        uploadContainer.addEventListener('click', () => audioFile.click());
+        uploadContainer.addEventListener('dragover', (e) => { e.preventDefault(); uploadContainer.style.borderColor = '#6366F1'; });
+        uploadContainer.addEventListener('dragleave', () => uploadContainer.style.borderColor = '#3A4559');
+        uploadContainer.addEventListener('drop', (e) => { e.preventDefault(); if(e.dataTransfer.files.length) handleFileSelection(e.dataTransfer.files[0]); });
+        audioFile.addEventListener('change', (e) => { if(e.target.files.length) handleFileSelection(e.target.files[0]); });
+
+        function handleFileSelection(file) {
+            const validTypes = ['audio/mpeg', 'audio/wav', 'audio/mp4', 'audio/x-m4a', 'video/mp4'];
+            if (!validTypes.includes(file.type) && !file.name.match(/\.(mp3|wav|m4a|mp4)$/i)) {
+                showNotification('Please upload a valid audio/video file', 'error');
+                return;
+            }
+            if (file.size > 100 * 1024 * 1024) { showNotification('File size must be less than 100MB', 'error'); return; }
+            selectedFile = file;
+            fileInfo.innerHTML = `<i class="fas fa-check-circle" style="color: #10B981;"></i> ${file.name} (${(file.size / (1024 * 1024)).toFixed(2)} MB)`;
+            transcribeBtn.disabled = false;
+            
+            currentAudioUrl = URL.createObjectURL(file);
+            const audioElement = document.getElementById('transcriptAudio');
+            if (audioElement) audioElement.src = currentAudioUrl;
+        }
+
+        function clearAll() { selectedFile = null; fileInfo.innerHTML = ''; audioFile.value = ''; transcribeBtn.disabled = true; }
+        function cancelUpload() { clearAll(); document.getElementById('progressSection').style.display = 'none'; }
+
+        // ========== START TRANSCRIPTION ==========
+        async function startTranscription() {
+            if (!selectedFile) { showNotification('Please select a file first', 'error'); return; }
+
+            const progressSection = document.getElementById('progressSection');
+            const progressBar = document.getElementById('progressBar');
+            const progressPercentage = document.getElementById('progressPercentage');
+            
+            progressSection.style.display = 'block';
+            transcribeBtn.disabled = true;
+            
+            const formData = new FormData();
+            formData.append('audio', selectedFile);
+            formData.append('language', document.getElementById('autoDetect').checked ? 'auto' : document.getElementById('languageSelect').value);
+
+            try {
+                let progress = 0;
+                const interval = setInterval(() => { progress += 5; if(progress <= 90) { progressBar.style.width = `${progress}%`; progressPercentage.textContent = `${progress}%`; } }, 500);
+
+                const response = await fetch('/api/transcribe', { method: 'POST', body: formData });
+                clearInterval(interval);
+
+                if (!response.ok) throw new Error((await response.json()).error || 'Transcription failed');
+                
+                const data = await response.json();
+                if (data.success) {
+                    progressBar.style.width = '100%';
+                    progressPercentage.textContent = '100%';
+                    
+                    currentTranscript = data.transcript;
+                    currentTranscriptId = data.db_id;
+                    
+                    setTimeout(() => {
+                        progressSection.style.display = 'none';
+                        displayTranscript(data.transcript, data.language_name || 'English');
+                        showNotification('Transcription completed successfully!', 'success');
+                        loadTranscripts();
+                    }, 500);
+                }
+            } catch (error) {
+                showNotification('Error: ' + error.message, 'error');
+            } finally { transcribeBtn.disabled = false; }
+        }
+
+        // ========== LOAD TRANSCRIPTS ==========
+        async function loadTranscripts() {
+            try {
+                const response = await fetch('/api/transcripts');
+                const data = await response.json();
+                const recentList = document.getElementById('recentTranscriptsList');
+                
+                if (!data.success || !data.transcripts || data.transcripts.length === 0) {
+                    recentList.innerHTML = `<div class="empty-state"><i class="fas fa-file-audio"></i><p>No transcriptions yet. Upload your first file.</p></div>`;
+                    return;
+                }
+                
+                const recent = data.transcripts.slice(0, 5);
+                let totalDuration = 0;
+                const languages = new Set();
+                
+                recentList.innerHTML = recent.map(t => {
+                    totalDuration += t.duration || 0;
+                    if (t.language_name) languages.add(t.language_name);
+                    return `
+                        <div class="recent-item" data-id="${t.id}">
+                            <div class="recent-icon"><i class="fas fa-file-audio"></i></div>
+                            <div class="recent-details" onclick="loadTranscriptFromDB(${t.id})">
+                                <div class="recent-title">${escapeHtml(t.title || t.filename)}</div>
+                                <div class="recent-meta">
+                                    <span><i class="fas fa-clock"></i> ${formatDuration(t.duration)}</span>
+                                    <span><i class="fas fa-user-friends"></i> ${t.speaker_count || 0}</span>
+                                </div>
+                            </div>
+                            <span class="language-badge">${t.language_name || t.language || 'EN'}</span>
+                            <div class="recent-actions-menu">
+                                <button class="action-icon" onclick="event.stopPropagation(); viewTranscript(${t.id})" title="View"><i class="fas fa-eye"></i></button>
+                                <button class="action-icon" onclick="event.stopPropagation(); downloadTranscript(${t.id})" title="Download"><i class="fas fa-download"></i></button>
+                                <button class="action-icon" onclick="event.stopPropagation(); showRenameModal(${t.id}, '${escapeHtml(t.title || t.filename)}')" title="Rename"><i class="fas fa-edit"></i></button>
+                                <button class="action-icon" onclick="event.stopPropagation(); shareTranscriptItem(${t.id}, '${escapeHtml(t.title || t.filename)}')" title="Share"><i class="fas fa-share-alt"></i></button>
+                                <button class="action-icon delete" onclick="event.stopPropagation(); deleteTranscriptItem(${t.id})" title="Delete"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                document.getElementById('totalFiles').textContent = data.transcripts.length;
+                document.getElementById('totalDuration').textContent = Math.floor(totalDuration / 60);
+                document.getElementById('totalLanguages').textContent = languages.size || '0';
+            } catch (error) {
+                console.error('Failed to load transcripts:', error);
+            }
+        }
+
+        // ========== TRANSCRIPT CRUD ==========
+        async function loadTranscriptFromDB(id) {
+            try {
+                const response = await fetch(`/api/transcripts/${id}`);
+                const data = await response.json();
+                if (data.success) {
+                    currentTranscript = data.transcript.full_data;
+                    currentTranscriptId = data.transcript.id;
+                    displayTranscript(currentTranscript, data.transcript.language_name || 'English');
+                    showNotification('Transcript loaded!', 'success');
+                    document.querySelector('.results-card').scrollIntoView({ behavior: 'smooth' });
+                }
+            } catch (error) {
+                showNotification('Failed to load transcript', 'error');
+            }
+        }
+
+        async function viewTranscript(id) { await loadTranscriptFromDB(id); }
+        
+        async function downloadTranscript(id) {
+            try {
+                const response = await fetch(`/api/transcripts/${id}/export/txt`);
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `transcript_${id}.txt`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showNotification('Download started!', 'success');
+            } catch (error) {
+                showNotification('Download failed', 'error');
+            }
+        }
+
+        function showRenameModal(transcriptId, currentName) {
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-container">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-edit"></i> Rename Transcript</h3>
+                        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="text" class="modal-input" id="newName" value="${escapeHtml(currentName)}">
+                        <div class="modal-buttons">
+                            <button class="modal-btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancel</button>
+                            <button class="modal-btn-primary" id="confirmRename">Rename</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+            document.getElementById('confirmRename').onclick = async () => {
+                const newName = document.getElementById('newName').value.trim();
+                if (newName) {
+                    await renameTranscript(transcriptId, newName);
+                    modal.remove();
+                }
+            };
+        }
+
+        async function renameTranscript(id, newName) {
+            try {
+                const response = await fetch(`/api/transcripts/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title: newName })
+                });
+                if ((await response.json()).success) {
+                    showNotification('Renamed!', 'success');
+                    loadTranscripts();
+                }
+            } catch (error) { showNotification('Rename failed', 'error'); }
+        }
+
+        async function deleteTranscriptItem(id) {
+            if (!confirm('Delete this transcript?')) return;
+            try {
+                const response = await fetch(`/api/transcripts/${id}`, { method: 'DELETE' });
+                if ((await response.json()).success) {
+                    showNotification('Deleted!', 'success');
+                    loadTranscripts();
+                    if (currentTranscriptId === id) {
+                        document.getElementById('transcriptPlaceholder').style.display = 'block';
+                        document.getElementById('transcriptDisplay').style.display = 'none';
+                        document.getElementById('resultsActions').style.display = 'none';
+                        document.getElementById('quickModules').style.display = 'none';
+                    }
+                }
+            } catch (error) { showNotification('Delete failed', 'error'); }
+        }
+
+        function shareTranscriptItem(id, title) {
+            if (navigator.share) {
+                navigator.share({ title: title, text: `Check out this transcript: ${title}`, url: window.location.href });
+            } else {
+                navigator.clipboard.writeText(`${title} - ${window.location.href}`);
+                showNotification('Link copied!', 'success');
+            }
+        }
+
+        // ========== STORAGE FUNCTIONS ==========
+        function saveHighlightToStorage(highlight) {
+            const key = `highlights_${currentTranscriptId}`;
+            const existing = JSON.parse(localStorage.getItem(key) || '[]');
+            existing.push(highlight);
+            localStorage.setItem(key, JSON.stringify(existing));
+        }
+
+        function saveNoteToStorage(note) {
+            const key = `notes_${currentTranscriptId}`;
+            const existing = JSON.parse(localStorage.getItem(key) || '[]');
+            existing.push(note);
+            localStorage.setItem(key, JSON.stringify(existing));
+        }
+
+        // ========== TAB SWITCHING ==========
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'speakers') loadSpeakerStats();
+            if (tabName === 'highlights') loadHighlightsFromStorage();
+            if (tabName === 'notes') loadNotesFromStorage();
+        }
+
+        function loadSpeakerStats() {
+            if (!currentTranscript) return;
+            const speakerStats = {};
+            currentTranscript.segments.forEach(segment => {
+                const speaker = segment.speaker;
+                if (!speakerStats[speaker]) speakerStats[speaker] = { words: 0, segments: 0 };
+                speakerStats[speaker].words += segment.text.split(' ').length;
+                speakerStats[speaker].segments++;
+            });
+            const speakerList = document.getElementById('speakerList');
+            speakerList.innerHTML = Object.entries(speakerStats).map(([speaker, stats]) => `
+                <div class="speaker-block">
+                    <div class="speaker-header"><i class="fas fa-user-circle"></i> ${speaker}</div>
+                    <div class="speaker-text">${stats.segments} segments • ${stats.words} words</div>
+                </div>
+            `).join('');
+        }
+
+        function loadHighlightsFromStorage() {
+            const key = `highlights_${currentTranscriptId}`;
+            const highlights = JSON.parse(localStorage.getItem(key) || '[]');
+            const highlightsList = document.getElementById('highlightsList');
+            
+            if (highlights.length === 0) {
+                highlightsList.innerHTML = '<p style="color: var(--text-muted); padding: 20px; text-align: center;">No highlights yet. Click on any word or sentence to highlight it.</p>';
+                return;
+            }
+            
+            highlightsList.innerHTML = highlights.map(h => `
+                <div class="speaker-block" style="border-left-color: ${h.color === 'yellow' ? '#F59E0B' : h.color === 'green' ? '#10B981' : '#EF4444'}">
+                    <div class="speaker-header"><i class="fas fa-highlighter"></i> ${h.type === 'word' ? 'Word' : 'Sentence'} Highlight (${h.color})</div>
+                    <div class="speaker-text">${escapeHtml(h.text)}</div>
+                    <div class="timestamp">${new Date(h.timestamp).toLocaleString()}</div>
+                    <button class="icon-btn" onclick="removeHighlight(${h.id})"><i class="fas fa-trash"></i> Remove</button>
+                </div>
+            `).join('');
+        }
+
+        function removeHighlight(highlightId) {
+            const key = `highlights_${currentTranscriptId}`;
+            let highlights = JSON.parse(localStorage.getItem(key) || '[]');
+            highlights = highlights.filter(h => h.id !== highlightId);
+            localStorage.setItem(key, JSON.stringify(highlights));
+            loadHighlightsFromStorage();
+            showNotification('Highlight removed', 'success');
+        }
+
+        function loadNotesFromStorage() {
+            const key = `notes_${currentTranscriptId}`;
+            const notes = JSON.parse(localStorage.getItem(key) || '[]');
+            const notesList = document.getElementById('notesList');
+            
+            if (notes.length === 0) {
+                notesList.innerHTML = '<p style="color: var(--text-muted); padding: 20px; text-align: center;">No notes yet. Double-click on any word or click Add Note to add a note.</p>';
+                return;
+            }
+            
+            notesList.innerHTML = notes.map(n => `
+                <div class="speaker-block">
+                    <div class="speaker-header"><i class="fas fa-sticky-note"></i> Note</div>
+                    <div class="speaker-text"><strong>Reference:</strong> ${escapeHtml(n.text)}</div>
+                    <div class="speaker-text" style="margin-top: 8px;"><strong>Note:</strong> ${escapeHtml(n.note)}</div>
+                    <div class="timestamp">${new Date(n.timestamp).toLocaleString()}</div>
+                    <button class="icon-btn" onclick="removeNote(${n.id})"><i class="fas fa-trash"></i> Delete</button>
+                </div>
+            `).join('');
+        }
+
+        function removeNote(noteId) {
+            const key = `notes_${currentTranscriptId}`;
+            let notes = JSON.parse(localStorage.getItem(key) || '[]');
+            notes = notes.filter(n => n.id !== noteId);
+            localStorage.setItem(key, JSON.stringify(notes));
+            loadNotesFromStorage();
+            showNotification('Note deleted', 'success');
+        }
+
+        // ========== TRANSLATION FUNCTIONS ==========
+        async function translateFullTranscript() {
+            if (!currentTranscript) { showNotification('No transcript available', 'error'); return; }
+            
+            const targetLang = document.getElementById('translateTargetLang').value;
+            const fullText = currentTranscript.segments.map(s => s.text).join('\n');
+            const translationResult = document.getElementById('translationResult');
+            translationResult.style.display = 'block';
+            translationResult.innerHTML = '<div style="text-align: center;"><i class="fas fa-circle-notch fa-spin"></i> Translating...</div>';
+            
+            try {
+                const response = await fetch('/api/translate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: fullText, target_lang: targetLang })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    translationResult.innerHTML = `<div class="speaker-block"><div class="speaker-header"><i class="fas fa-language"></i> Translation (${targetLang.toUpperCase()})</div><div class="speaker-text" style="white-space: pre-wrap;">${escapeHtml(data.translation)}</div></div>`;
+                    showNotification('Translation completed!', 'success');
+                }
+            } catch (error) {
+                translationResult.innerHTML = '<p style="color: var(--accent-danger);">Translation failed</p>';
+            }
+        }
+
+        async function translateSegment(segmentIndex) {
+            const segment = currentTranscript.segments[segmentIndex];
+            const targetLang = prompt('Enter target language:\nhi - Hindi\nmr - Marathi\nta - Tamil\nte - Telugu\nbn - Bengali\nen - English', 'hi');
+            if (!targetLang) return;
+            
+            const translationDiv = document.getElementById(`text-${segmentIndex}`);
+            const originalText = translationDiv.innerHTML;
+            translationDiv.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Translating...';
+            
+            try {
+                const response = await fetch('/api/translate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: segment.text, target_lang: targetLang })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    translationDiv.innerHTML = `${escapeHtml(data.translation)}<br><small style="color: var(--text-muted); display: block; margin-top: 8px;">Original: ${escapeHtml(segment.text)}</small>`;
+                    showNotification('Segment translated!', 'success');
+                }
+            } catch (error) {
+                translationDiv.innerHTML = originalText;
+                showNotification('Translation failed', 'error');
+            }
+        }
+
+        // ========== EXPORT FUNCTIONS ==========
+        function exportAs(format) {
+            if (!currentTranscript) return;
+            const text = currentTranscript.segments.map(s => `${s.speaker}: ${s.text}`).join('\n\n');
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `transcript_${new Date().toISOString().slice(0,10)}.${format}`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification('Downloaded!', 'success');
+        }
+
+        function copyTranscript() {
+            if (!currentTranscript) return;
+            const text = currentTranscript.segments.map(s => `${s.speaker}: ${s.text}`).join('\n\n');
+            navigator.clipboard.writeText(text);
+            showNotification('Copied!', 'success');
+        }
+
+        function shareTranscript() {
+            if (navigator.share && currentTranscript) {
+                const text = currentTranscript.segments.map(s => `${s.speaker}: ${s.text}`).join('\n\n');
+                navigator.share({ title: 'Transcript', text: text });
+            } else { showNotification('Copy manually', 'info'); }
+        }
+
+        // ========== INITIALIZATION ==========
+        document.getElementById('autoDetect').addEventListener('change', function(e) {
+            const languageSelect = document.getElementById('languageSelect');
+            languageSelect.disabled = this.checked;
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => { await fetch('/api/logout', { method: 'POST' }); window.location.href = '/'; });
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const response = await fetch('/api/user/profile');
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success) {
+                    document.getElementById('userName').textContent = data.user.full_name || data.user.username;
+                    await loadTranscripts();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

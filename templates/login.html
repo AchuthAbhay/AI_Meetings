@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InsightFlow | Login</title>
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-card {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .input-field {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+            transform: translateY(-2px);
+        }
+        .social-btn {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .social-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+        }
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #94a3b8;
+            transition: color 0.2s ease;
+        }
+        .password-toggle:hover {
+            color: #3b82f6;
+        }
+        .input-group {
+            position: relative;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center p-4" id="vanta-bg">
+    <div class="container mx-auto max-w-lg">
+        <div class="glass-card rounded-2xl p-8" data-aos="fade-up">
+            <div class="text-center mb-8">
+                <div class="flex justify-center items-center mb-4">
+                    <i data-feather="activity" class="w-8 h-8 text-blue-400 mr-3"></i>
+                    <h1 class="text-3xl font-bold">Welcome Back</h1>
+                </div>
+                <p class="text-slate-400">Sign in to your InsightFlow account</p>
+            </div>
+
+            <div id="welcomeMessage" class="hidden">
+                <div class="bg-green-900/20 p-4 rounded-lg border border-green-800/30 mb-6">
+                    <div class="flex items-center">
+                        <i data-feather="check-circle" class="w-5 h-5 text-green-400 mr-2"></i>
+                        <div>
+                            <div class="font-semibold text-green-300">Account created successfully!</div>
+                            <div class="text-sm text-green-400">Please sign in to continue</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <form class="space-y-6" id="loginForm">
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold text-slate-300 flex items-center">
+                        <i data-feather="log-in" class="w-5 h-5 mr-2"></i>
+                        Sign In
+                    </h3>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Email Address</label>
+                        <input type="email" id="email" class="w-full input-field rounded-lg py-3 px-4 text-white focus:outline-none" placeholder="john@example.com" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-300 mb-2">Password</label>
+                        <div class="input-group">
+                            <input type="password" id="password" class="w-full input-field rounded-lg py-3 px-4 text-white focus:outline-none" placeholder="••••••••" required>
+                            <button type="button" class="password-toggle" onclick="togglePasswordVisibility('password', this)">
+                                <i data-feather="eye" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="remember" class="h-4 w-4 rounded bg-slate-800 border-slate-700 focus:ring-blue-500">
+                            <label for="remember" class="ml-2 text-sm text-slate-400">Remember this device</label>
+                        </div>
+                        <a href="#" class="text-sm text-blue-400 hover:text-blue-300 transition">Forgot password?</a>
+                    </div>
+                </div>
+
+                <div class="bg-slate-800/20 p-4 rounded-lg border border-slate-700/30">
+                    <h4 class="font-semibold text-slate-300 mb-3 flex items-center">
+                        <i data-feather="shield" class="w-4 h-4 text-green-400 mr-2"></i>
+                        Your files are protected with:
+                    </h4>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div class="flex items-center">
+                            <i data-feather="lock" class="w-3 h-3 text-green-400 mr-1"></i>
+                            <span>Bank-level encryption</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i data-feather="key" class="w-3 h-3 text-green-400 mr-1"></i>
+                            <span>Secure file access</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i data-feather="eye-off" class="w-3 h-3 text-green-400 mr-1"></i>
+                            <span>Private to you</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i data-feather="smartphone" class="w-3 h-3 text-green-400 mr-1"></i>
+                            <span>Works on all devices</span>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full btn-primary py-4 px-6 rounded-lg font-semibold text-white text-lg flex items-center justify-center">
+                    <i data-feather="log-in" class="w-5 h-5 mr-2"></i>
+                    <span id="loginText">Sign In to InsightFlow</span>
+                    <div id="loginSpinner" class="hidden ml-2">
+                        <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    </div>
+                </button>
+
+                <div id="loginMessage" class="text-center text-sm hidden p-3 rounded-lg"></div>
+
+                <div class="relative flex items-center">
+                    <div class="flex-grow border-t border-slate-700"></div>
+                    <span class="flex-shrink mx-4 text-slate-500 text-sm">Or continue with</span>
+                    <div class="flex-grow border-t border-slate-700"></div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <button type="button" class="social-btn flex items-center justify-center py-3 px-4 rounded-lg bg-slate-800 hover:bg-slate-700 transition" onclick="loginWithGoogle()">
+                        <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24">
+                            <path fill="#4285F4" d="M21.35 11.1H12v2.8h5.35C16.1 16.7 14.25 18 12 18c-3.3 0-6-2.7-6-6s2.7-6 6-6c1.54 0 2.93.59 3.99 1.54l2.36-2.36C17.89 4.57 15.06 3 12 3 6.48 3 2 7.48 2 13s4.48 10 10 10c5.3 0 9.73-4.09 9.95-9.38.02-.42.05-.84.05-1.52 0-.48-.02-.96-.05-1.5z"/>
+                        </svg>
+                        <span>Google</span>
+                    </button>
+
+                    <button type="button" class="social-btn flex items-center justify-center py-3 px-4 rounded-lg bg-slate-800 hover:bg-slate-700 transition" onclick="loginWithMicrosoft()">
+                        <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24">
+                            <path fill="#F25022" d="M0 0h11v11H0z"/>
+                            <path fill="#7FBA00" d="M13 0h11v11H13z"/>
+                            <path fill="#00A4EF" d="M0 13h11v11H0z"/>
+                            <path fill="#FFB900" d="M13 13h11v11H13z"/>
+                        </svg>
+                        <span>Microsoft</span>
+                    </button>
+                </div>
+
+                <div class="help-text p-4 rounded-lg">
+                    <div class="flex items-start">
+                        <i data-feather="info" class="w-4 h-4 text-blue-400 mr-2 mt-0.5 flex-shrink-0"></i>
+                        <div class="text-sm">
+                            <strong>Remember:</strong> If you set up file protection, you'll need your security PIN to access downloaded files.
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <div class="text-center text-sm text-slate-400 mt-6">
+                New to InsightFlow? <a href="/signup" class="text-blue-400 hover:text-blue-300 transition font-medium">Create an Account</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        AOS.init();
+        feather.replace();
+        
+        VANTA.NET({
+            el: "#vanta-bg",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0x3b82f6,
+            backgroundColor: 0x0f172a,
+            points: 12.00,
+            maxDistance: 22.00,
+            spacing: 18.00
+        });
+
+        function togglePasswordVisibility(inputId, button) {
+            const input = document.getElementById(inputId);
+            const icon = button.querySelector('i');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                feather.replace({ icons: { 'eye-off': icon } });
+                button.innerHTML = '<i data-feather="eye-off" class="w-5 h-5"></i>';
+            } else {
+                input.type = 'password';
+                button.innerHTML = '<i data-feather="eye" class="w-5 h-5"></i>';
+            }
+            feather.replace();
+        }
+
+        async function loginWithGoogle() {
+            showMessage('Google login is being configured. Please use email/password for now.', 'info');
+        }
+
+        async function loginWithMicrosoft() {
+            showMessage('Microsoft login is being configured. Please use email/password for now.', 'info');
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('welcome') === 'true') {
+                document.getElementById('welcomeMessage').classList.remove('hidden');
+            }
+
+            const loginForm = document.getElementById('loginForm');
+            const loginText = document.getElementById('loginText');
+            const loginSpinner = document.getElementById('loginSpinner');
+            const loginMessage = document.getElementById('loginMessage');
+            
+            if (loginForm) {
+                loginForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+                    const rememberMe = document.getElementById('remember').checked;
+                    
+                    if (!email || !password) {
+                        showMessage('Please enter both email and password.', 'error');
+                        return;
+                    }
+                    
+                    loginText.textContent = 'Signing In...';
+                    loginSpinner.classList.remove('hidden');
+                    loginForm.querySelector('button[type="submit"]').disabled = true;
+                    loginMessage.classList.add('hidden');
+                    
+                    try {
+                        const response = await fetch('/api/login', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ 
+                                email: email, 
+                                password: password,
+                                remember: rememberMe
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            showMessage('Welcome back! Redirecting to your dashboard...', 'success');
+                            setTimeout(() => {
+                                window.location.href = '/dashboard';
+                            }, 1500);
+                        } else {
+                            showMessage(data.error || 'Sign in failed. Please check your credentials and try again.', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Login error:', error);
+                        showMessage('Unable to connect. Please check your internet and try again.', 'error');
+                    } finally {
+                        loginText.textContent = 'Sign In to InsightFlow';
+                        loginSpinner.classList.add('hidden');
+                        loginForm.querySelector('button[type="submit"]').disabled = false;
+                    }
+                });
+            }
+        });
+
+        function showMessage(message, type) {
+            const messageEl = document.getElementById('loginMessage');
+            messageEl.textContent = message;
+            messageEl.className = `text-center text-sm p-3 rounded-lg ${type === 'error' ? 'bg-red-900/50 text-red-300' : type === 'success' ? 'bg-green-900/50 text-green-300' : 'bg-blue-900/50 text-blue-300'}`;
+            messageEl.classList.remove('hidden');
+            
+            setTimeout(() => {
+                messageEl.classList.add('hidden');
+            }, 5000);
+        }
+
+        document.getElementById('email').focus();
+    </script>
+</body>
+</html>

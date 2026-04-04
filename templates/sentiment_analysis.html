@@ -1,0 +1,1924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Sentiment Analysis - InsightFlow AI | Advanced Emotion Intelligence</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0A0F1F;
+            color: #E2E8F0;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        :root {
+            --bg-deep: #0A0F1F;
+            --bg-dark: #0F1625;
+            --bg-card: rgba(26, 35, 53, 0.85);
+            --bg-elevated: rgba(34, 45, 66, 0.7);
+            --accent-primary: #6366F1;
+            --accent-secondary: #8B5CF6;
+            --accent-tertiary: #3B82F6;
+            --accent-glow: #A78BFA;
+            --accent-success: #10B981;
+            --accent-warning: #F59E0B;
+            --accent-danger: #EF4444;
+            --accent-pink: #EC4899;
+            --accent-cyan: #06B6D4;
+            --text-primary: #F1F5F9;
+            --text-secondary: #CBD5E1;
+            --text-muted: #94A3B8;
+            --border-light: rgba(45, 55, 72, 0.6);
+            --border-medium: #3A4559;
+            --gradient-primary: linear-gradient(135deg, #6366F1, #8B5CF6);
+            --gradient-secondary: linear-gradient(135deg, #8B5CF6, #EC4899);
+            --gradient-success: linear-gradient(135deg, #10B981, #34D399);
+            --gradient-warning: linear-gradient(135deg, #F59E0B, #F97316);
+            --gradient-danger: linear-gradient(135deg, #EF4444, #F87171);
+            --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.5);
+            --glass-effect: backdrop-filter: blur(12px);
+        }
+
+        .dashboard-container {
+            display: flex;
+            height: 100vh;
+            background: radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .dashboard-container::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: linear-gradient(rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: rgba(20, 27, 43, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(99, 102, 241, 0.2);
+            height: 100vh;
+            overflow-y: auto;
+            padding: 24px 0;
+            transition: width 0.3s ease;
+            flex-shrink: 0;
+            z-index: 20;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .sidebar.collapsed .logo-text,
+        .sidebar.collapsed .user-profile-mini span,
+        .sidebar.collapsed .user-profile-mini small,
+        .sidebar.collapsed .nav-text,
+        .sidebar.collapsed .sidebar-footer span {
+            display: none;
+        }
+
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 12px 0;
+        }
+
+        .sidebar.collapsed .nav-icon {
+            margin-right: 0;
+            font-size: 20px;
+        }
+
+        .toggle-sidebar-btn {
+            position: absolute;
+            right: -12px;
+            top: 70px;
+            width: 24px;
+            height: 24px;
+            background: var(--gradient-primary);
+            border: 2px solid var(--bg-dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            color: white;
+            font-size: 12px;
+            transition: all 0.2s ease;
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+        }
+
+        .toggle-sidebar-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.8);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 24px;
+            margin-bottom: 32px;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--gradient-primary);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .user-profile-mini {
+            padding: 16px 20px;
+            margin: 0 16px 24px;
+            background: rgba(26, 35, 53, 0.6);
+            border-radius: 16px;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        .user-profile-mini i {
+            color: var(--accent-primary);
+            margin-right: 10px;
+        }
+
+        .user-profile-mini span {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .user-profile-mini small {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            margin-left: 28px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 16px;
+        }
+
+        .nav-item {
+            margin: 4px 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 14px;
+            transition: all 0.3s ease;
+            gap: 14px;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 0;
+            height: 100%;
+            background: var(--gradient-primary);
+            opacity: 0.2;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::before {
+            width: 100%;
+        }
+
+        .nav-link:hover {
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+        }
+
+        .nav-icon {
+            width: 22px;
+            font-size: 18px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .sidebar-footer {
+            padding: 24px 20px;
+            border-top: 1px solid rgba(99, 102, 241, 0.2);
+            margin-top: 20px;
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 12px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 14px;
+            color: #F87171;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: var(--accent-danger);
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px 28px;
+            position: relative;
+            z-index: 1;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        /* Header */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            background: rgba(20, 27, 43, 0.7);
+            backdrop-filter: blur(10px);
+            padding: 14px 24px;
+            border-radius: 20px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .menu-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            background: rgba(34, 45, 66, 0.5);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .menu-toggle:hover {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .header-left h1 {
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #F1F5F9, #A78BFA);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-left h1 i {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .notifications {
+            position: relative;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            background: rgba(34, 45, 66, 0.5);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .notifications:hover {
+            background: rgba(99, 102, 241, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .notifications i {
+            font-size: 18px;
+            color: var(--text-secondary);
+        }
+
+        .badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--accent-danger);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+            animation: pulse 1s infinite;
+        }
+
+        .user-profile {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 2px solid var(--accent-primary);
+            transition: all 0.3s ease;
+        }
+
+        .user-profile:hover {
+            transform: scale(1.05);
+            border-color: var(--accent-glow);
+        }
+
+        .user-profile img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Stats Cards */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: rgba(26, 35, 53, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .stat-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-primary);
+            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.2);
+        }
+
+        .stat-icon {
+            width: 52px;
+            height: 52px;
+            background: var(--gradient-primary);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .stat-info h3 {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #F1F5F9, #CBD5E1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-desc {
+            font-size: 11px;
+            color: var(--accent-success);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Two Column Layout */
+        .two-column-layout {
+            display: grid;
+            grid-template-columns: 0.85fr 1.15fr;
+            gap: 24px;
+            height: calc(100vh - 180px);
+        }
+
+        /* Left Column */
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        /* Input Card */
+        .input-card {
+            background: rgba(26, 35, 53, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .input-card:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        .input-card h2 {
+            font-size: 18px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #F1F5F9, #A78BFA);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Input Tabs */
+        .input-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .input-tab {
+            flex: 1;
+            padding: 10px 12px;
+            background: rgba(34, 45, 66, 0.5);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 30px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .input-tab:hover {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .input-tab.active {
+            background: var(--gradient-primary);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .input-section {
+            background: rgba(34, 45, 66, 0.5);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .transcript-selector,
+        .text-area-container {
+            display: none;
+        }
+
+        .transcript-selector.active,
+        .text-area-container.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .transcript-select {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(20, 27, 43, 0.8);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .transcript-select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .custom-textarea {
+            width: 100%;
+            height: 140px;
+            padding: 12px;
+            background: rgba(20, 27, 43, 0.8);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 13px;
+            resize: vertical;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .custom-textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .char-counter {
+            text-align: right;
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .analyze-btn {
+            width: 100%;
+            background: var(--gradient-primary);
+            border: none;
+            padding: 12px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .analyze-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .analyze-btn:hover::after {
+            opacity: 1;
+        }
+
+        .analyze-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5);
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-container {
+            background: rgba(34, 45, 66, 0.5);
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 12px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .progress-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: rgba(20, 27, 43, 0.8);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-percent {
+            text-align: right;
+            font-size: 10px;
+            margin-top: 4px;
+            color: var(--accent-primary);
+        }
+
+        /* Recent Card */
+        .recent-card {
+            background: rgba(26, 35, 53, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 200px;
+            transition: all 0.3s ease;
+        }
+
+        .recent-card:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        .recent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .recent-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .recent-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .recent-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(34, 45, 66, 0.5);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .recent-item:hover {
+            background: rgba(99, 102, 241, 0.2);
+            transform: translateX(3px);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .recent-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        /* Right Column */
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        /* Sentiment Card */
+        .sentiment-card {
+            background: rgba(26, 35, 53, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .sentiment-card:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        .sentiment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .sentiment-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #F1F5F9, #A78BFA);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sentiment-badge {
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .badge-positive {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .badge-negative {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--accent-danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .badge-neutral {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--accent-warning);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        /* Meter */
+        .meter-container {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+
+        .meter-gauge {
+            width: 140px;
+            height: 140px;
+            position: relative;
+        }
+
+        .meter-gauge svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.2));
+        }
+
+        .meter-bg {
+            fill: none;
+            stroke: rgba(34, 45, 66, 0.8);
+            stroke-width: 12;
+        }
+
+        .meter-fill {
+            fill: none;
+            stroke-width: 12;
+            stroke-linecap: round;
+            stroke: url(#gradient);
+            transition: stroke-dasharray 1s ease;
+            filter: drop-shadow(0 0 5px rgba(99, 102, 241, 0.5));
+        }
+
+        .meter-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 28px;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .meter-score {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #F1F5F9, #CBD5E1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .meter-desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Explanation Card */
+        .explanation-card {
+            background: rgba(34, 45, 66, 0.6);
+            border-radius: 16px;
+            padding: 16px;
+            margin-top: 8px;
+            border-left: 4px solid var(--accent-primary);
+            transition: all 0.3s ease;
+        }
+
+        .explanation-card:hover {
+            border-left-color: var(--accent-glow);
+            background: rgba(34, 45, 66, 0.8);
+        }
+
+        .explanation-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--accent-primary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .explanation-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Confidence Meter */
+        .confidence-meter {
+            background: rgba(34, 45, 66, 0.5);
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 12px;
+        }
+
+        .confidence-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 11px;
+        }
+
+        .confidence-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: rgba(20, 27, 43, 0.8);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .confidence-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        /* Emotion Grid */
+        .emotion-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .emotion-item {
+            background: rgba(34, 45, 66, 0.5);
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .emotion-item:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .emotion-name {
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .emotion-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(20, 27, 43, 0.8);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        .emotion-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .emotion-value {
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        /* Timeline Card */
+        .timeline-card {
+            background: rgba(26, 35, 53, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-card:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        .timeline-bars {
+            display: flex;
+            align-items: flex-end;
+            height: 100px;
+            gap: 4px;
+            margin: 16px 0 10px;
+        }
+
+        .timeline-bar {
+            flex: 1;
+            border-radius: 6px 6px 0 0;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .timeline-bar:hover {
+            transform: scaleY(1.05);
+            filter: brightness(1.1);
+        }
+
+        .timeline-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        /* Chart Card */
+        .chart-card {
+            background: rgba(26, 35, 53, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .chart-card:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+        }
+
+        .chart-type-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .chart-type-btn {
+            padding: 6px 14px;
+            background: rgba(34, 45, 66, 0.5);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .chart-type-btn:hover {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .chart-type-btn.active {
+            background: var(--gradient-primary);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 2px 10px rgba(99, 102, 241, 0.3);
+        }
+
+        .chart-container {
+            height: 260px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        canvas {
+            max-height: 240px;
+            max-width: 100%;
+            margin: 0 auto;
+            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.2));
+        }
+
+        /* Phrases List */
+        .phrases-list {
+            max-height: 180px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .phrase-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: rgba(34, 45, 66, 0.5);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .phrase-item:hover {
+            transform: translateX(3px);
+            background: rgba(99, 102, 241, 0.2);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+
+        .phrase-score {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .score-positive {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .score-negative {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--accent-danger);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .phrase-text {
+            flex: 1;
+            font-size: 12px;
+            color: var(--text-primary);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 10px;
+            background: rgba(34, 45, 66, 0.5);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 30px;
+            color: var(--text-secondary);
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: var(--gradient-primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .download-dropdown {
+            position: relative;
+            flex: 1;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: rgba(20, 27, 43, 0.95);
+            backdrop-filter: blur(10px);
+            min-width: 120px;
+            border-radius: 10px;
+            z-index: 10;
+            margin-top: 6px;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            overflow: hidden;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .download-dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content button {
+            width: 100%;
+            padding: 8px 14px;
+            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 11px;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-content button:hover {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--accent-glow);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 40px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(20, 27, 43, 0.5);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gradient-primary);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-glow);
+        }
+
+        @media (max-width: 1200px) {
+            .two-column-layout {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .emotion-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 1000;
+            }
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            .menu-toggle {
+                display: flex;
+            }
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+            .emotion-grid {
+                grid-template-columns: 1fr;
+            }
+            .meter-container {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="toggle-sidebar-btn" id="toggleSidebar"><i class="fas fa-chevron-left"></i></div>
+            <div class="logo">
+                <div class="logo-icon"><i class="fas fa-brain"></i></div>
+                <span class="logo-text">InsightFlow AI</span>
+            </div>
+            <div class="user-profile-mini">
+                <i class="fas fa-user-circle"></i>
+                <span id="userName">Loading...</span>
+                <small>AI Analyst</small>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/dashboard" class="nav-link">
+                        <i class="fas fa-home nav-icon"></i>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/live-transcription" class="nav-link">
+                        <i class="fas fa-microphone-alt nav-icon"></i>
+                        <span class="nav-text">Live Transcription</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/upload-transcribe" class="nav-link">
+                        <i class="fas fa-upload nav-icon"></i>
+                        <span class="nav-text">Upload & Transcribe</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/summarization" class="nav-link">
+                        <i class="fas fa-file-alt nav-icon"></i>
+                        <span class="nav-text">Summarization</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/my-tasks" class="nav-link">
+                        <i class="fas fa-tasks nav-icon"></i>
+                        <span class="nav-text">My Tasks</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/speaker-identification" class="nav-link">
+                        <i class="fas fa-user-friends nav-icon"></i>
+                        <span class="nav-text">Speaker Identification</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/sentiment-analysis" class="nav-link active">
+                        <i class="fas fa-smile nav-icon"></i>
+                        <span class="nav-text">Sentiment Analysis</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/translation" class="nav-link">
+                        <i class="fas fa-language nav-icon"></i>
+                        <span class="nav-text">Translation</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/files-history" class="nav-link">
+                        <i class="fas fa-folder-open nav-icon"></i>
+                        <span class="nav-text">Files / History</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/analytics" class="nav-link">
+                        <i class="fas fa-chart-line nav-icon"></i>
+                        <span class="nav-text">Analytics & Reports</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/calendar" class="nav-link">
+                        <i class="fas fa-calendar-alt nav-icon"></i>
+                        <span class="nav-text">Calendar Integration</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/profile" class="nav-link">
+                        <i class="fas fa-cog nav-icon"></i>
+                        <span class="nav-text">Settings / Profile</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i><span>Logout</span></button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+                    <h1><i class="fas fa-smile"></i> Sentiment Analysis</h1>
+                </div>
+                <div class="header-right">
+                    <div class="notifications"><i class="fas fa-bell"></i><span class="badge">3</span></div>
+                    <div class="user-profile"><img src="https://ui-avatars.com/api/?name=User&background=6366F1&color=fff" alt="Profile"></div>
+                </div>
+            </header>
+
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-chart-line"></i></div><div class="stat-info"><h3>Analyses</h3><div class="stat-number" id="totalAnalyses">0</div><div class="stat-desc"><i class="fas fa-arrow-up"></i> All time</div></div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-smile"></i></div><div class="stat-info"><h3>Positive</h3><div class="stat-number" id="positiveCount">0</div><div class="stat-desc"><i class="fas fa-arrow-up" style="color: var(--accent-success);"></i> Happy</div></div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-meh"></i></div><div class="stat-info"><h3>Neutral</h3><div class="stat-number" id="neutralCount">0</div><div class="stat-desc"><i class="fas fa-minus" style="color: var(--accent-warning);"></i> Balanced</div></div></div>
+                <div class="stat-card"><div class="stat-icon"><i class="fas fa-frown"></i></div><div class="stat-info"><h3>Negative</h3><div class="stat-number" id="negativeCount">0</div><div class="stat-desc"><i class="fas fa-arrow-down" style="color: var(--accent-danger);"></i> Critical</div></div></div>
+            </div>
+
+            <!-- Two Column Layout -->
+            <div class="two-column-layout">
+                <!-- Left Column -->
+                <div class="left-column">
+                    <!-- Input Card -->
+                    <div class="input-card">
+                        <h2><i class="fas fa-pen-alt"></i> Input Source</h2>
+                        <div class="input-tabs">
+                            <div class="input-tab active" onclick="switchInputTab('transcript')"><i class="fas fa-history"></i> Transcript</div>
+                            <div class="input-tab" onclick="switchInputTab('text')"><i class="fas fa-edit"></i> Text</div>
+                        </div>
+                        <div class="input-section transcript-selector active" id="transcriptSelector">
+                            <select class="transcript-select" id="transcriptSelect" onchange="loadSelectedTranscript()">
+                                <option value="">Choose a transcript...</option>
+                            </select>
+                            <div id="transcriptPreview" style="margin-top: 12px; font-size: 12px; color: var(--text-muted);"></div>
+                        </div>
+                        <div class="input-section text-area-container" id="textAreaContainer">
+                            <textarea class="custom-textarea" id="transcriptText" placeholder="Paste your text here for sentiment analysis... Supports Hindi, Marathi, Tamil, Telugu, Bengali, English, and more..."></textarea>
+                            <div class="char-counter" id="charCounter">0 characters</div>
+                        </div>
+                        <button class="analyze-btn" id="analyzeBtn" onclick="analyzeSentiment()"><i class="fas fa-magic"></i> Analyze Sentiment</button>
+                        <div class="progress-container" id="progressSection" style="display: none;">
+                            <div class="progress-status"><i class="fas fa-circle-notch fa-spin"></i><span id="progressStatus">Analyzing...</span></div>
+                            <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar" style="width: 0%"></div></div>
+                            <div class="progress-percent" id="progressPercentage">0%</div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Analyses Card -->
+                    <div class="recent-card">
+                        <div class="recent-header"><h3><i class="fas fa-history"></i> Recent Analyses</h3><span id="recentCount">0</span></div>
+                        <div class="recent-list" id="recentList"><div class="empty-state"><i class="fas fa-chart-line"></i><p>No analyses yet</p></div></div>
+                    </div>
+                </div>
+
+                <!-- Right Column - Results -->
+                <div class="right-column" id="resultsColumn" style="display: none;">
+                    <!-- Overall Sentiment Card -->
+                    <div class="sentiment-card">
+                        <div class="sentiment-header"><h3><i class="fas fa-chart-pie"></i> Overall Sentiment</h3><span class="sentiment-badge" id="sentimentBadge">Positive</span></div>
+                        <div class="meter-container">
+                            <div class="meter-gauge">
+                                <svg viewBox="0 0 180 180">
+                                    <defs><linearGradient id="gradient"><stop offset="0%" stop-color="var(--accent-danger)"/><stop offset="50%" stop-color="var(--accent-warning)"/><stop offset="100%" stop-color="var(--accent-success)"/></linearGradient></defs>
+                                    <circle class="meter-bg" cx="90" cy="90" r="75"></circle>
+                                    <circle class="meter-fill" cx="90" cy="90" r="75" stroke-dasharray="471" stroke-dashoffset="235.5" transform="rotate(-90 90 90)"></circle>
+                                </svg>
+                                <div class="meter-value" id="sentimentScore">50%</div>
+                            </div>
+                            <div><div class="meter-score" id="sentimentScoreText">50% Positive</div><div class="meter-desc" id="sentimentDesc">Balanced sentiment</div></div>
+                        </div>
+                        <div class="explanation-card"><div class="explanation-title"><i class="fas fa-lightbulb"></i> Why this sentiment?</div><div class="explanation-text" id="explanationText">Analysis in progress...</div></div>
+                        <div class="confidence-meter" id="confidenceMeter" style="display: none;"><div class="confidence-header"><span>Analysis Confidence</span><span id="confidenceValue">0%</span></div><div class="confidence-bar-bg"><div class="confidence-bar-fill" id="confidenceFill" style="width: 0%; background: var(--gradient-primary);"></div></div></div>
+                    </div>
+
+                    <!-- Emotion Breakdown -->
+                    <div class="sentiment-card">
+                        <div class="sentiment-header"><h3><i class="fas fa-chart-bar"></i> Emotion Breakdown</h3><span>8 emotions</span></div>
+                        <div class="emotion-grid" id="emotionGrid"></div>
+                    </div>
+
+                    <!-- Sentiment Timeline -->
+                    <div class="timeline-card">
+                        <div class="sentiment-header"><h3><i class="fas fa-chart-line"></i> Sentiment Timeline</h3><span id="timelineRange">0 segments</span></div>
+                        <div class="timeline-bars" id="timelineBars"><div class="empty-state"><i class="fas fa-chart-line"></i><p>Timeline will appear after analysis</p></div></div>
+                        <div class="timeline-labels"><span>Start</span><span>→</span><span>Middle</span><span>→</span><span>End</span></div>
+                    </div>
+
+                    <!-- Emotion Visualization -->
+                    <div class="chart-card">
+                        <div class="sentiment-header"><h3><i class="fas fa-chart-pie"></i> Emotion Visualization</h3></div>
+                        <div class="chart-type-selector" id="chartTypeSelector">
+                            <button class="chart-type-btn active" onclick="switchChartType('bar')"><i class="fas fa-chart-bar"></i> Bar</button>
+                            <button class="chart-type-btn" onclick="switchChartType('pie')"><i class="fas fa-chart-pie"></i> Pie</button>
+                            <button class="chart-type-btn" onclick="switchChartType('doughnut')"><i class="fas fa-chart-line"></i> Doughnut</button>
+                            <button class="chart-type-btn" onclick="switchChartType('radar')"><i class="fas fa-chart-area"></i> Radar</button>
+                        </div>
+                        <div class="chart-container"><canvas id="emotionChart" width="400" height="250"></canvas></div>
+                    </div>
+
+                    <!-- Key Emotional Phrases -->
+                    <div class="sentiment-card">
+                        <div class="sentiment-header"><h3><i class="fas fa-quote-right"></i> Key Emotional Phrases</h3><span id="phrasesCount">0 phrases</span></div>
+                        <div class="phrases-list" id="phrasesList"><div class="empty-state"><i class="fas fa-quote-right"></i><p>No phrases detected</p></div></div>
+                        <div class="action-buttons">
+                            <div class="download-dropdown"><button class="action-btn"><i class="fas fa-download"></i> Export</button><div class="dropdown-content"><button onclick="exportSentimentData('json')"><i class="fas fa-file-code"></i> JSON</button><button onclick="exportSentimentData('csv')"><i class="fas fa-file-csv"></i> CSV</button><button onclick="exportSentimentData('doc')"><i class="fas fa-file-word"></i> DOC</button></div></div>
+                            <button class="action-btn" onclick="copyResults()"><i class="fas fa-copy"></i> Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Sidebar Toggle
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const toggleBtn = document.getElementById('toggleSidebar');
+        const menuToggle = document.getElementById('menuToggle');
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            sidebar.classList.add('collapsed');
+            mainContent.classList.add('expanded');
+            toggleBtn.querySelector('i').classList.replace('fa-chevron-left', 'fa-chevron-right');
+        }
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            const icon = toggleBtn.querySelector('i');
+            if (sidebar.classList.contains('collapsed')) {
+                icon.classList.replace('fa-chevron-left', 'fa-chevron-right');
+                localStorage.setItem('sidebarCollapsed', 'true');
+            } else {
+                icon.classList.replace('fa-chevron-right', 'fa-chevron-left');
+                localStorage.setItem('sidebarCollapsed', 'false');
+            }
+        });
+        menuToggle.addEventListener('click', () => { sidebar.classList.toggle('mobile-open'); });
+
+        // Global Variables
+        let transcriptsList = [];
+        let sentimentHistory = JSON.parse(localStorage.getItem('sentimentHistory')) || [];
+        let currentInputMode = 'transcript';
+        let currentTranscriptData = null;
+        let currentSentimentResult = null;
+        let currentAnalyzedText = '';
+        let emotionChart = null;
+        let currentChartType = 'bar';
+
+        function updateStatsDisplay() {
+            document.getElementById('totalAnalyses').textContent = sentimentHistory.length;
+            document.getElementById('positiveCount').textContent = sentimentHistory.filter(s => s.sentiment === 'Positive').length;
+            document.getElementById('neutralCount').textContent = sentimentHistory.filter(s => s.sentiment === 'Neutral').length;
+            document.getElementById('negativeCount').textContent = sentimentHistory.filter(s => s.sentiment === 'Negative').length;
+            document.getElementById('recentCount').textContent = sentimentHistory.length;
+            
+            const recentList = document.getElementById('recentList');
+            if (sentimentHistory.length === 0) {
+                recentList.innerHTML = '<div class="empty-state"><i class="fas fa-chart-line"></i><p>No analyses yet</p></div>';
+            } else {
+                recentList.innerHTML = sentimentHistory.slice(-5).reverse().map(s => {
+                    const icon = s.sentiment === 'Positive' ? 'fa-smile' : s.sentiment === 'Negative' ? 'fa-frown' : 'fa-meh';
+                    const color = s.sentiment === 'Positive' ? 'rgba(16,185,129,0.2)' : s.sentiment === 'Negative' ? 'rgba(239,68,68,0.2)' : 'rgba(245,158,11,0.2)';
+                    return `<div class="recent-item" onclick="loadRecentAnalysis('${s.id}')"><div class="recent-badge" style="background: ${color};"><i class="fas ${icon}"></i></div><div class="recent-text">${s.sentiment} sentiment detected</div><div class="recent-time">${new Date(s.timestamp).toLocaleTimeString()}</div></div>`;
+                }).join('');
+            }
+        }
+        updateStatsDisplay();
+
+        async function loadTranscripts() {
+            try {
+                const response = await fetch('/api/transcripts');
+                const data = await response.json();
+                if (data.success && data.transcripts) {
+                    transcriptsList = data.transcripts;
+                    const select = document.getElementById('transcriptSelect');
+                    let options = '<option value="">Choose a transcript...</option>';
+                    transcriptsList.forEach(t => { options += `<option value="${t.id}">📝 ${escapeHtml(t.title || t.filename)} - ${t.language_name || 'English'}</option>`; });
+                    select.innerHTML = options;
+                }
+            } catch (error) { console.error('Failed to load transcripts:', error); }
+        }
+
+        async function loadSelectedTranscript() {
+            const selectedId = document.getElementById('transcriptSelect').value;
+            if (!selectedId) return;
+            try {
+                const response = await fetch(`/api/transcripts/${selectedId}`);
+                const data = await response.json();
+                if (data.success && data.transcript) {
+                    currentTranscriptData = data.transcript;
+                    let fullText = '';
+                    if (currentTranscriptData.full_data?.segments) fullText = currentTranscriptData.full_data.segments.map(s => s.text).join(' ');
+                    else if (currentTranscriptData.segments) fullText = currentTranscriptData.segments.map(s => s.text).join(' ');
+                    document.getElementById('transcriptText').value = fullText;
+                    updateCharCount();
+                    document.getElementById('transcriptPreview').innerHTML = `<i class="fas fa-check-circle"></i> Loaded: ${escapeHtml(currentTranscriptData.title)}`;
+                    setTimeout(() => document.getElementById('transcriptPreview').innerHTML = '', 3000);
+                }
+            } catch (error) { showNotification('Failed to load transcript', 'error'); }
+        }
+
+        function switchInputTab(mode) {
+            currentInputMode = mode;
+            document.querySelectorAll('.input-tab').forEach(t => t.classList.remove('active'));
+            if (mode === 'transcript') {
+                document.querySelector('.input-tab:first-child').classList.add('active');
+                document.getElementById('transcriptSelector').classList.add('active');
+                document.getElementById('textAreaContainer').classList.remove('active');
+            } else {
+                document.querySelector('.input-tab:last-child').classList.add('active');
+                document.getElementById('textAreaContainer').classList.add('active');
+                document.getElementById('transcriptSelector').classList.remove('active');
+            }
+        }
+
+        function updateCharCount() { document.getElementById('charCounter').textContent = `${document.getElementById('transcriptText').value.length} characters`; }
+        document.getElementById('transcriptText').addEventListener('input', updateCharCount);
+
+        async function analyzeSentiment() {
+            let text = document.getElementById('transcriptText').value.trim();
+            if (!text) { showNotification('Please enter text', 'error'); return; }
+            currentAnalyzedText = text;
+            document.getElementById('progressSection').style.display = 'block';
+            document.getElementById('analyzeBtn').disabled = true;
+            try {
+                let progress = 0, interval = setInterval(() => { progress += 10; if (progress <= 90) updateProgress(progress, 'Analyzing...'); }, 300);
+                const response = await fetch('/api/sentiment', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ transcript: text }) });
+                clearInterval(interval);
+                const data = await response.json();
+                if (data.success) {
+                    updateProgress(100, 'Complete!');
+                    setTimeout(() => {
+                        document.getElementById('progressSection').style.display = 'none';
+                        displaySentimentResults(data.result);
+                        document.getElementById('analyzeBtn').disabled = false;
+                    }, 500);
+                } else throw new Error(data.error || 'Analysis failed');
+            } catch (error) {
+                document.getElementById('progressSection').style.display = 'none';
+                showNotification(error.message, 'error');
+                document.getElementById('analyzeBtn').disabled = false;
+            }
+        }
+
+        function updateProgress(p, s) {
+            document.getElementById('progressBar').style.width = `${p}%`;
+            document.getElementById('progressPercentage').textContent = `${p}%`;
+            document.getElementById('progressStatus').innerHTML = `<i class="fas fa-circle-notch fa-spin"></i><span>${s}</span>`;
+        }
+
+        function generateExplanation(sentiment, score, emotions) {
+            const dominant = Object.entries(emotions).sort((a,b) => b[1]-a[1])[0];
+            const dName = dominant[0].charAt(0).toUpperCase() + dominant[0].slice(1);
+            const dScore = Math.round(dominant[1] * 100);
+            const exps = {
+                positive: [`The text shows strong positive sentiment with ${dScore}% ${dName} emotion. Key positive words like "great", "excellent", or "happy" contribute to this optimistic tone.`],
+                negative: [`The text shows negative sentiment with ${dScore}% ${dName} emotion. Words like "bad", "issues", or "frustrated" indicate concerns or dissatisfaction.`],
+                neutral: [`The text shows neutral sentiment with ${dScore}% ${dName} emotion. The language is factual, objective, and balanced without strong emotional expression.`]
+            };
+            return exps[sentiment.toLowerCase()][0];
+        }
+
+        function generateTimeline(text) {
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 20);
+            const segments = Math.min(sentences.length, 20);
+            document.getElementById('timelineRange').textContent = `${segments} segments`;
+            
+            if (segments === 0) {
+                document.getElementById('timelineBars').innerHTML = '<div class="empty-state"><i class="fas fa-chart-line"></i><p>Not enough text for timeline</p></div>';
+                return;
+            }
+            
+            let bars = '';
+            for (let i = 0; i < segments; i++) {
+                const sent = sentences[i];
+                let sentimentScore = 0;
+                const posWords = ['great','good','love','excellent','amazing','happy','best','wonderful','fantastic','awesome','perfect'];
+                const negWords = ['bad','terrible','awful','hate','issues','problems','frustrated','angry','disappointed','worried'];
+                const words = sent.toLowerCase().split(/\s+/);
+                words.forEach(w => { if(posWords.includes(w)) sentimentScore += 0.15; if(negWords.includes(w)) sentimentScore -= 0.15; });
+                sentimentScore = Math.min(0.8, Math.max(-0.8, sentimentScore));
+                const height = 30 + Math.abs(sentimentScore) * 70;
+                const color = sentimentScore > 0.2 ? '#10B981' : sentimentScore < -0.2 ? '#EF4444' : '#F59E0B';
+                const sentimentText = sentimentScore > 0.2 ? 'Positive' : sentimentScore < -0.2 ? 'Negative' : 'Neutral';
+                bars += `<div class="timeline-bar" style="height: ${height}px; background: ${color};" title="Segment ${i+1}: ${sentimentText} (${Math.round(sentimentScore*100)}%)"></div>`;
+            }
+            document.getElementById('timelineBars').innerHTML = bars;
+        }
+
+        function updateEmotionChart(emotionScores) {
+            const labels = ['Angry', 'Frustrated', 'Happy', 'Sad', 'Anxious', 'Excited', 'Calm', 'Surprised'];
+            const data = [emotionScores.angry||0, emotionScores.frustrated||0, emotionScores.happy||0, emotionScores.sad||0, emotionScores.anxious||0, emotionScores.excited||0, emotionScores.calm||0, emotionScores.surprised||0];
+            const colors = ['#EF4444', '#F97316', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#06B6D4', '#F59E0B'];
+            const ctx = document.getElementById('emotionChart').getContext('2d');
+            if (emotionChart) emotionChart.destroy();
+            let config = {
+                type: currentChartType,
+                data: { labels, datasets: [{ label: 'Emotion Intensity', data, backgroundColor: colors, borderColor: '#fff', borderWidth: 2 }] },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom', labels: { color: '#CBD5E1', font: { size: 10 } } }, tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${Math.round(ctx.raw * 100)}%` } } } }
+            };
+            if (currentChartType === 'bar') config.options.scales = { y: { beginAtZero: true, max: 1, ticks: { callback: (v) => `${Math.round(v*100)}%`, color: '#94A3B8' }, grid: { color: 'rgba(99,102,241,0.1)' } }, x: { ticks: { color: '#CBD5E1' } } };
+            if (currentChartType === 'radar') config.options.scales = { r: { beginAtZero: true, max: 1, ticks: { stepSize: 0.2, color: '#94A3B8' }, grid: { color: 'rgba(99,102,241,0.1)' } } };
+            emotionChart = new Chart(ctx, config);
+        }
+
+        function switchChartType(type) {
+            currentChartType = type;
+            document.querySelectorAll('.chart-type-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            if (currentSentimentResult && currentSentimentResult.emotion_scores) updateEmotionChart(currentSentimentResult.emotion_scores);
+        }
+
+        function displaySentimentResults(result) {
+            currentSentimentResult = result;
+            document.getElementById('resultsColumn').style.display = 'flex';
+            const sentiment = result.sentiment || 'Neutral';
+            const polarity = result.polarity_score || 0;
+            const scorePercent = Math.round((polarity + 1) * 50);
+            const emotionScores = result.emotion_scores || { angry:0, frustrated:0, happy:0, sad:0, anxious:0, excited:0, calm:0, surprised:0 };
+            const confidence = result.confidence || 0.85;
+            document.getElementById('sentimentBadge').textContent = sentiment;
+            document.getElementById('sentimentBadge').className = `sentiment-badge badge-${sentiment.toLowerCase()}`;
+            const offset = 471 - (scorePercent/100)*471;
+            document.querySelector('.meter-fill').setAttribute('stroke-dashoffset', offset);
+            document.getElementById('sentimentScore').textContent = scorePercent+'%';
+            document.getElementById('sentimentScoreText').textContent = `${scorePercent}% ${sentiment}`;
+            document.getElementById('explanationText').textContent = generateExplanation(sentiment, polarity, emotionScores);
+            document.getElementById('confidenceMeter').style.display = 'block';
+            document.getElementById('confidenceValue').textContent = `${Math.round(confidence*100)}%`;
+            document.getElementById('confidenceFill').style.width = `${confidence*100}%`;
+            
+            // Emotion Grid
+            const emotions = [{name:'Angry',key:'angry',color:'#EF4444',icon:'fa-angry'},{name:'Frustrated',key:'frustrated',color:'#F97316',icon:'fa-frown'},{name:'Happy',key:'happy',color:'#10B981',icon:'fa-smile'},{name:'Sad',key:'sad',color:'#3B82F6',icon:'fa-sad-tear'},{name:'Anxious',key:'anxious',color:'#8B5CF6',icon:'fa-face-frown'},{name:'Excited',key:'excited',color:'#EC4899',icon:'fa-grin-stars'},{name:'Calm',key:'calm',color:'#06B6D4',icon:'fa-water'},{name:'Surprised',key:'surprised',color:'#F59E0B',icon:'fa-surprise'}];
+            document.getElementById('emotionGrid').innerHTML = emotions.map(e => { let score = emotionScores[e.key]||0; return `<div class="emotion-item"><div class="emotion-name"><i class="fas ${e.icon}"></i> ${e.name}</div><div class="emotion-bar"><div class="emotion-fill" style="width:${score*100}%; background:${e.color};"></div></div><div class="emotion-value">${Math.round(score*100)}%</div></div>`; }).join('');
+            
+            // Timeline
+            generateTimeline(currentAnalyzedText);
+            
+            // Chart
+            updateEmotionChart(emotionScores);
+            
+            // Key Emotional Phrases
+            const phrases = [];
+            const posPhrases = ['great job', 'excellent work', 'well done', 'good idea', 'love it', 'fantastic', 'amazing', 'impressive', 'outstanding', 'perfect', 'brilliant', 'wonderful', 'awesome', 'superb', 'very good', 'nice work'];
+            const negPhrases = ['bad idea', 'not working', 'issues with', 'problems with', 'frustrated with', 'concerned about', 'worried', 'terrible', 'awful', 'disappointed', 'poor', 'difficult', 'challenging', 'not good', 'very bad'];
+            posPhrases.forEach(p => { if(currentAnalyzedText.toLowerCase().includes(p)) phrases.push({ text: p, score: 0.75 }); });
+            negPhrases.forEach(p => { if(currentAnalyzedText.toLowerCase().includes(p)) phrases.push({ text: p, score: -0.65 }); });
+            
+            // Also extract custom phrases based on sentiment words
+            const words = currentAnalyzedText.toLowerCase().split(/\s+/);
+            for(let i = 0; i < words.length - 2; i++) {
+                const phrase = words.slice(i, i+3).join(' ');
+                if((phrase.includes('great') || phrase.includes('good') || phrase.includes('love')) && !phrases.some(p => p.text === phrase)) {
+                    phrases.push({ text: phrase, score: 0.6 });
+                }
+                if((phrase.includes('bad') || phrase.includes('issue') || phrase.includes('problem')) && !phrases.some(p => p.text === phrase)) {
+                    phrases.push({ text: phrase, score: -0.55 });
+                }
+            }
+            
+            const uniquePhrases = [];
+            phrases.forEach(p => { if(!uniquePhrases.some(ex => ex.text === p.text)) uniquePhrases.push(p); });
+            const topPhrases = uniquePhrases.sort((a,b) => Math.abs(b.score) - Math.abs(a.score)).slice(0, 8);
+            
+            document.getElementById('phrasesCount').textContent = `${topPhrases.length} phrases`;
+            if(topPhrases.length === 0) {
+                document.getElementById('phrasesList').innerHTML = '<div class="empty-state"><i class="fas fa-quote-right"></i><p>No emotional phrases detected</p></div>';
+            } else {
+                document.getElementById('phrasesList').innerHTML = topPhrases.map(p => {
+                    const scoreClass = p.score > 0 ? 'score-positive' : 'score-negative';
+                    return `<div class="phrase-item"><div class="phrase-score ${scoreClass}">${p.score > 0 ? '+' : ''}${p.score.toFixed(1)}</div><div class="phrase-text">"${escapeHtml(p.text)}"</div></div>`;
+                }).join('');
+            }
+            
+            // Save to history
+            sentimentHistory.unshift({ id: Date.now(), sentiment: sentiment, timestamp: new Date().toISOString() });
+            localStorage.setItem('sentimentHistory', JSON.stringify(sentimentHistory.slice(0, 20)));
+            updateStatsDisplay();
+        }
+
+        function loadRecentAnalysis(id) {
+            const analysis = sentimentHistory.find(s => s.id == id);
+            if (analysis) {
+                showNotification(`Analysis from ${new Date(analysis.timestamp).toLocaleString()}`, 'info');
+                // Here you would load and display the full analysis
+            }
+        }
+
+        function exportSentimentData(format) {
+            if (!currentSentimentResult) { showNotification('No data to export', 'error'); return; }
+            const fileName = `sentiment_${new Date().toISOString().slice(0,10)}`;
+            if (format === 'json') {
+                const data = { sentiment: currentSentimentResult, text: currentAnalyzedText.substring(0, 500) };
+                downloadFile(JSON.stringify(data, null, 2), `${fileName}.json`, 'application/json');
+            } else if (format === 'csv') {
+                const csv = `Sentiment,${currentSentimentResult.sentiment}\nPolarity,${currentSentimentResult.polarity_score}\nConfidence,${currentSentimentResult.confidence||0.85}`;
+                downloadFile(csv, `${fileName}.csv`, 'text/csv');
+            } else {
+                const doc = `<html><body><h1>Sentiment Report</h1><p>Sentiment: ${currentSentimentResult.sentiment}</p><p>Score: ${currentSentimentResult.polarity_score}</p><p>Generated: ${new Date().toLocaleString()}</p></body></html>`;
+                downloadFile(doc, `${fileName}.doc`, 'application/msword');
+            }
+            showNotification('Exported!', 'success');
+        }
+
+        function copyResults() {
+            if (!currentSentimentResult) return;
+            const text = `Sentiment Analysis Results\n------------------------\nSentiment: ${currentSentimentResult.sentiment}\nPolarity Score: ${currentSentimentResult.polarity_score}\nConfidence: ${Math.round((currentSentimentResult.confidence||0.85)*100)}%\nAnalysis Time: ${new Date().toLocaleString()}\n\nExplanation: ${document.getElementById('explanationText').textContent}`;
+            navigator.clipboard.writeText(text);
+            showNotification('Copied!', 'success');
+        }
+
+        function downloadFile(content, filename, type) {
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => m==='&'?'&amp;':m==='<'?'&lt;':'&gt;'); }
+        function showNotification(msg, type) {
+            const n = document.createElement('div');
+            n.style.cssText = `position:fixed;bottom:20px;right:20px;background:${type==='success'?'#10B981':'#EF4444'};color:white;padding:12px 24px;border-radius:40px;z-index:10001;animation:slideInRight 0.3s ease;`;
+            n.innerHTML = `<i class="fas ${type==='success'?'fa-check-circle':'fa-exclamation-circle'}"></i> ${msg}`;
+            document.body.appendChild(n);
+            setTimeout(() => n.remove(), 3000);
+        }
+
+        async function loadUserProfile() {
+            try {
+                const response = await fetch('/api/user/profile');
+                const data = await response.json();
+                if (data.success) document.getElementById('userName').textContent = data.user.full_name || data.user.username;
+            } catch (error) { document.getElementById('userName').textContent = 'User'; }
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', () => { localStorage.removeItem('isLoggedIn'); window.location.href = '/'; });
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadUserProfile();
+            await loadTranscripts();
+            window.switchInputTab = switchInputTab;
+            window.loadSelectedTranscript = loadSelectedTranscript;
+            window.analyzeSentiment = analyzeSentiment;
+            window.exportSentimentData = exportSentimentData;
+            window.copyResults = copyResults;
+            window.loadRecentAnalysis = loadRecentAnalysis;
+            window.switchChartType = switchChartType;
+        });
+    </script>
+</body>
+</html>

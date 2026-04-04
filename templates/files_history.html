@@ -1,0 +1,2205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Files & History - InsightFlow AI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0A0F1F;
+            color: #E2E8F0;
+            overflow: hidden;
+        }
+
+        /* Purple-Blue Theme */
+        :root {
+            --bg-deep: #0A0F1F;
+            --bg-dark: #141B2B;
+            --bg-card: #1A2335;
+            --bg-elevated: #222D42;
+            --bg-hover: #2A374F;
+            --accent-primary: #6366F1;
+            --accent-secondary: #8B5CF6;
+            --accent-tertiary: #3B82F6;
+            --accent-glow: #A78BFA;
+            --accent-success: #10B981;
+            --accent-warning: #F59E0B;
+            --accent-danger: #EF4444;
+            --text-primary: #F1F5F9;
+            --text-secondary: #CBD5E1;
+            --text-muted: #94A3B8;
+            --border-light: #2D3748;
+            --border-medium: #3A4559;
+            --gradient-primary: linear-gradient(135deg, #6366F1, #8B5CF6);
+            --gradient-success: linear-gradient(135deg, #10B981, #34D399);
+            --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5);
+            --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.6);
+            --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Page Scrollbar */
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-primary) var(--bg-dark);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-primary);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-glow);
+        }
+
+        .dashboard-container {
+            display: flex;
+            height: 100vh;
+            background: var(--bg-deep);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Grid Background Effect */
+        .dashboard-container::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+
+        /* Sidebar - Collapsible */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-dark);
+            border-right: 1px solid var(--border-light);
+            height: 100vh;
+            overflow-y: auto;
+            padding: 24px 0;
+            box-shadow: var(--shadow-sm);
+            z-index: 10;
+            transition: width 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .sidebar.collapsed .logo-text,
+        .sidebar.collapsed .user-profile-mini span,
+        .sidebar.collapsed .user-profile-mini small,
+        .sidebar.collapsed .nav-text,
+        .sidebar.collapsed .sidebar-footer span {
+            display: none;
+        }
+
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 12px 0;
+        }
+
+        .sidebar.collapsed .nav-icon {
+            margin-right: 0;
+            font-size: 20px;
+        }
+
+        .sidebar.collapsed .user-profile-mini i {
+            margin-right: 0;
+            font-size: 24px;
+        }
+
+        .sidebar.collapsed .logo {
+            justify-content: center;
+            padding: 0 10px;
+        }
+
+        .toggle-sidebar-btn {
+            position: absolute;
+            right: -12px;
+            top: 70px;
+            width: 24px;
+            height: 24px;
+            background: var(--accent-primary);
+            border: 2px solid var(--bg-dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            color: white;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-sidebar-btn:hover {
+            background: var(--accent-glow);
+            transform: scale(1.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 24px;
+            margin-bottom: 32px;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--gradient-primary);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .user-profile-mini {
+            padding: 16px 20px;
+            margin: 0 16px 24px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-light);
+        }
+
+        .user-profile-mini i {
+            color: var(--accent-primary);
+            margin-right: 10px;
+        }
+
+        .user-profile-mini span {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .user-profile-mini small {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            margin-left: 28px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 16px;
+        }
+
+        .nav-item {
+            margin: 4px 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 14px;
+            transition: all 0.2s ease;
+            gap: 14px;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: var(--bg-hover);
+            color: var(--accent-glow);
+        }
+
+        .nav-link.active {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+        }
+
+        .nav-icon {
+            width: 22px;
+            font-size: 18px;
+        }
+
+        .sidebar-footer {
+            padding: 24px 20px;
+            border-top: 1px solid var(--border-light);
+            margin-top: 20px;
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            border: 1px solid var(--border-light);
+            border-radius: 14px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-danger);
+            border-color: var(--accent-danger);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 24px 32px;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        /* Header */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            background: var(--bg-dark);
+            padding: 16px 24px;
+            border-radius: 20px;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .menu-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.2s ease;
+        }
+
+        .menu-toggle:hover {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .header-left h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-left h1 i {
+            color: var(--accent-primary);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .notifications {
+            position: relative;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            background: var(--bg-card);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-light);
+        }
+
+        .notifications i {
+            font-size: 18px;
+            color: var(--text-secondary);
+        }
+
+        .badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--accent-danger);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .user-profile {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 2px solid var(--accent-primary);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .user-profile img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Stats Cards */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover::before {
+            transform: translateX(0);
+        }
+
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .stat-info h3 {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        .stat-desc {
+            font-size: 10px;
+            color: var(--accent-success);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Main Content Grid - Full Height */
+        .content-grid {
+            display: flex;
+            gap: 20px;
+            height: calc(100vh - 180px);
+            min-height: 600px;
+        }
+
+        /* Left Panel - Files List */
+        .files-panel {
+            flex: 1;
+            background: var(--bg-card);
+            border-radius: 20px;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-header h2 i {
+            color: var(--accent-primary);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .header-btn {
+            padding: 8px 16px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: 30px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .header-btn:hover {
+            background: var(--gradient-primary);
+            color: white;
+            border-color: transparent;
+        }
+
+        /* Search Bar */
+        .search-container {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .search-box {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 42px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: 30px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .search-box input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Files List - Scrollable */
+        .files-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .files-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .files-list::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+            border-radius: 10px;
+        }
+
+        .files-list::-webkit-scrollbar-thumb {
+            background: var(--accent-primary);
+            border-radius: 10px;
+        }
+
+        /* File Item */
+        .file-item {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .file-item:hover {
+            border-color: var(--accent-primary);
+            transform: translateX(5px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .file-item.selected {
+            border: 2px solid var(--accent-primary);
+            background: linear-gradient(145deg, var(--bg-elevated), rgba(99, 102, 241, 0.1));
+        }
+
+        .file-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .file-type {
+            font-size: 10px;
+            padding: 2px 8px;
+            background: var(--bg-dark);
+            border-radius: 20px;
+            color: var(--accent-primary);
+            border: 1px solid var(--border-light);
+        }
+
+        .file-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .file-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .file-meta i {
+            color: var(--accent-primary);
+            font-size: 10px;
+        }
+
+        .file-actions {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: none;
+            gap: 6px;
+            background: var(--bg-card);
+            padding: 6px;
+            border-radius: 30px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .file-item:hover .file-actions {
+            display: flex;
+        }
+
+        .file-action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+        }
+
+        .file-action-btn:hover {
+            background: var(--gradient-primary);
+            color: white;
+            border-color: transparent;
+        }
+
+        .file-action-btn.delete:hover {
+            background: var(--accent-danger);
+        }
+
+        .file-action-btn.download:hover {
+            background: var(--accent-success);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 60px;
+            color: var(--border-medium);
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .empty-btn {
+            padding: 12px 24px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: 30px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .empty-btn:hover {
+            background: var(--gradient-primary);
+            color: white;
+            border-color: transparent;
+        }
+
+        /* Right Panel - Preview */
+        .preview-panel {
+            flex: 1.2;
+            background: var(--bg-card);
+            border-radius: 20px;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .preview-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .preview-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .preview-header h3 i {
+            color: var(--accent-primary);
+        }
+
+        .preview-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .preview-btn {
+            padding: 8px 16px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: 30px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .preview-btn:hover:not(:disabled) {
+            background: var(--gradient-primary);
+            color: white;
+            border-color: transparent;
+        }
+
+        .preview-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Preview Content */
+        .preview-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .preview-card {
+            background: var(--bg-elevated);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--border-light);
+            margin-bottom: 20px;
+        }
+
+        .preview-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .preview-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .preview-meta-item {
+            background: var(--bg-dark);
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid var(--border-light);
+        }
+
+        .meta-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .meta-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .preview-segments {
+            background: var(--bg-dark);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border-light);
+        }
+
+        .segment-item {
+            padding: 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .segment-item:last-child {
+            border-bottom: none;
+        }
+
+        .segment-speaker {
+            color: var(--accent-primary);
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .segment-text {
+            color: var(--text-secondary);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .preview-placeholder {
+            text-align: center;
+            padding: 80px 20px;
+            color: var(--text-muted);
+        }
+
+        .preview-placeholder i {
+            font-size: 64px;
+            color: var(--border-medium);
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .preview-placeholder p {
+            font-size: 14px;
+        }
+
+        /* Type Filters */
+        .type-filters {
+            display: flex;
+            gap: 8px;
+            padding: 0 20px 16px;
+            flex-wrap: wrap;
+        }
+
+        .type-filter {
+            padding: 6px 14px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: 30px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .type-filter:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-primary);
+            color: var(--text-primary);
+        }
+
+        .type-filter.active {
+            background: var(--gradient-primary);
+            color: white;
+            border-color: transparent;
+        }
+
+        .type-filter i {
+            font-size: 12px;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 28px;
+            max-width: 400px;
+            width: 100%;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-header h3 i {
+            color: var(--accent-primary);
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .close-modal:hover {
+            background: var(--bg-hover);
+            color: var(--accent-danger);
+        }
+
+        .modal-field {
+            margin-bottom: 16px;
+        }
+
+        .modal-field label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .modal-field input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .modal-field input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .modal-btn.primary {
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+        }
+
+        .modal-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .modal-btn.secondary {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+        }
+
+        .modal-btn.secondary:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-primary);
+            color: var(--text-primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .content-grid {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .preview-meta-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 16px;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+            }
+            
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+            
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .file-actions {
+                position: static;
+                transform: none;
+                margin-top: 12px;
+                justify-content: flex-end;
+            }
+            
+            .file-item:hover .file-actions {
+                display: flex;
+            }
+            
+            .type-filters {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding-bottom: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="toggle-sidebar-btn" id="toggleSidebar">
+                <i class="fas fa-chevron-left"></i>
+            </div>
+            
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <span class="logo-text">InsightFlow AI</span>
+            </div>
+            
+            <div class="user-profile-mini">
+                <i class="fas fa-user-circle"></i>
+                <span>Harshada Godse</span>
+                <small>AI Analyst</small>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/dashboard" class="nav-link">
+                        <i class="fas fa-home nav-icon"></i>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/live-transcription" class="nav-link">
+                        <i class="fas fa-microphone-alt nav-icon"></i>
+                        <span class="nav-text">Live Transcription</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/upload-transcribe" class="nav-link">
+                        <i class="fas fa-upload nav-icon"></i>
+                        <span class="nav-text">Upload & Transcribe</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/summarization" class="nav-link">
+                        <i class="fas fa-file-alt nav-icon"></i>
+                        <span class="nav-text">Summarization</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/my-tasks" class="nav-link">
+                        <i class="fas fa-tasks nav-icon"></i>
+                        <span class="nav-text">My Tasks</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/speaker-identification" class="nav-link">
+                        <i class="fas fa-user-friends nav-icon"></i>
+                        <span class="nav-text">Speaker Identification</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/sentiment-analysis" class="nav-link">
+                        <i class="fas fa-smile nav-icon"></i>
+                        <span class="nav-text">Sentiment Analysis</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/translation" class="nav-link">
+                        <i class="fas fa-language nav-icon"></i>
+                        <span class="nav-text">Translation</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/files-history" class="nav-link active">
+                        <i class="fas fa-folder-open nav-icon"></i>
+                        <span class="nav-text">Files / History</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/analytics" class="nav-link">
+                        <i class="fas fa-chart-line nav-icon"></i>
+                        <span class="nav-text">Analytics & Reports</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/calendar" class="nav-link">
+                        <i class="fas fa-calendar-alt nav-icon"></i>
+                        <span class="nav-text">Calendar Integration</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/profile" class="nav-link">
+                        <i class="fas fa-cog nav-icon"></i>
+                        <span class="nav-text">Settings / Profile</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1><i class="fas fa-folder-open"></i> Files & History</h1>
+                </div>
+                
+                <div class="header-right">
+                    <div class="notifications">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge">3</span>
+                    </div>
+                    <div class="user-profile">
+                        <img src="https://ui-avatars.com/api/?name=Harshada+Godse&background=6366F1&color=fff" alt="Profile">
+                    </div>
+                </div>
+            </header>
+
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Total Files</h3>
+                        <div class="stat-number" id="totalFiles">0</div>
+                        <div class="stat-desc">
+                            <i class="fas fa-arrow-up"></i> All time
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-microphone"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Audio Files</h3>
+                        <div class="stat-number" id="audioCount">0</div>
+                        <div class="stat-desc">
+                            <i class="fas fa-waveform"></i> Transcribed
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-file-lines"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Transcripts</h3>
+                        <div class="stat-number" id="transcriptCount">0</div>
+                        <div class="stat-desc">
+                            <i class="fas fa-check-circle"></i> Processed
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Total Hours</h3>
+                        <div class="stat-number" id="totalHours">0</div>
+                        <div class="stat-desc">
+                            <i class="fas fa-hourglass"></i> Recorded
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="content-grid">
+                <!-- Left Panel - Files List -->
+                <div class="files-panel">
+                    <div class="panel-header">
+                        <h2><i class="fas fa-list"></i> All Files</h2>
+                        <div class="header-actions">
+                            <button class="header-btn" onclick="refreshFiles()">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                            <button class="header-btn" onclick="clearAllFiles()">
+                                <i class="fas fa-trash"></i> Clear All
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Search Bar -->
+                    <div class="search-container">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchInput" placeholder="Search files..." oninput="filterFiles()">
+                        </div>
+                    </div>
+
+                    <!-- Type Filters -->
+                    <div class="type-filters">
+                        <span class="type-filter active" onclick="filterByType('all')" id="filterAll">
+                            <i class="fas fa-list"></i> All
+                        </span>
+                        <span class="type-filter" onclick="filterByType('audio')" id="filterAudio">
+                            <i class="fas fa-microphone"></i> Audio
+                        </span>
+                                                <span class="type-filter" onclick="filterByType('transcript')" id="filterTranscript">
+                            <i class="fas fa-file-alt"></i> Transcripts
+                        </span>
+                        <span class="type-filter" onclick="filterByType('summary')" id="filterSummary">
+                            <i class="fas fa-compress-alt"></i> Summaries
+                        </span>
+                        <span class="type-filter" onclick="filterByType('task')" id="filterTask">
+                            <i class="fas fa-tasks"></i> Tasks
+                        </span>
+                    </div>
+
+                    <!-- Files List - Scrollable -->
+                    <div class="files-list" id="filesList">
+                        <!-- Files will be dynamically inserted here -->
+                        <div class="empty-state">
+                            <i class="fas fa-folder-open"></i>
+                            <p>No files found. Start by uploading audio or creating transcripts.</p>
+                            <button class="empty-btn" onclick="location.href='/upload-transcribe'">
+                                <i class="fas fa-upload"></i> Upload Audio
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Panel - Preview -->
+                <div class="preview-panel">
+                    <div class="preview-header">
+                        <h3><i class="fas fa-eye"></i> File Preview</h3>
+                        <div class="preview-actions">
+                            <button class="preview-btn" id="downloadBtn" onclick="downloadCurrentFile()" disabled>
+                                <i class="fas fa-download"></i> Download
+                            </button>
+                            <button class="preview-btn" id="deleteBtn" onclick="deleteCurrentFile()" disabled>
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="preview-content" id="previewContent">
+                        <div class="preview-placeholder">
+                            <i class="fas fa-file-circle-plus"></i>
+                            <p>Select a file to preview its contents</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ========== SIDEBAR TOGGLE FUNCTIONALITY ==========
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const toggleBtn = document.getElementById('toggleSidebar');
+        const menuToggle = document.getElementById('menuToggle');
+
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            sidebar.classList.add('collapsed');
+            mainContent.classList.add('expanded');
+            toggleBtn.querySelector('i').classList.remove('fa-chevron-left');
+            toggleBtn.querySelector('i').classList.add('fa-chevron-right');
+        }
+
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+            
+            const icon = toggleBtn.querySelector('i');
+            if (sidebar.classList.contains('collapsed')) {
+                icon.classList.remove('fa-chevron-left');
+                icon.classList.add('fa-chevron-right');
+                localStorage.setItem('sidebarCollapsed', 'true');
+            } else {
+                icon.classList.remove('fa-chevron-right');
+                icon.classList.add('fa-chevron-left');
+                localStorage.setItem('sidebarCollapsed', 'false');
+            }
+        });
+
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('mobile-open');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+                    sidebar.classList.remove('mobile-open');
+                }
+            }
+        });
+
+        // ========== FILES & HISTORY FUNCTIONALITY ==========
+        
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.href = '/';
+        }
+
+        // DOM Elements
+        const filesList = document.getElementById('filesList');
+        const previewContent = document.getElementById('previewContent');
+        const searchInput = document.getElementById('searchInput');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const deleteBtn = document.getElementById('deleteBtn');
+        const totalFiles = document.getElementById('totalFiles');
+        const audioCount = document.getElementById('audioCount');
+        const transcriptCount = document.getElementById('transcriptCount');
+        const totalHours = document.getElementById('totalHours');
+
+        // Data stores
+        let allFiles = [];
+        let filteredFiles = [];
+        let currentFilter = 'all';
+        let searchTerm = '';
+        let selectedFile = null;
+
+        // Load all data from localStorage
+        function loadAllFiles() {
+            allFiles = [];
+            
+            // Load transcripts
+            try {
+                const transcripts = JSON.parse(localStorage.getItem('transcripts')) || [];
+                transcripts.forEach(t => {
+                    allFiles.push({
+                        id: t.id || `transcript_${Date.now()}_${Math.random()}`,
+                        name: t.name || 'Untitled Transcript',
+                        type: 'transcript',
+                        fileType: 'json',
+                        size: JSON.stringify(t).length,
+                        timestamp: t.timestamp || new Date().toISOString(),
+                        data: t,
+                        icon: 'fa-file-alt',
+                        color: '#6366F1',
+                        segments: t.segments || (t.transcript?.segments || [])
+                    });
+                });
+            } catch (e) {
+                console.error('Error loading transcripts:', e);
+            }
+
+            // Load summaries
+            try {
+                const summaries = JSON.parse(localStorage.getItem('summaries')) || [];
+                summaries.forEach(s => {
+                    allFiles.push({
+                        id: s.id || `summary_${Date.now()}_${Math.random()}`,
+                        name: s.title || 'Untitled Summary',
+                        type: 'summary',
+                        fileType: 'txt',
+                        size: s.content?.length || 0,
+                        timestamp: s.timestamp || new Date().toISOString(),
+                        data: s,
+                        icon: 'fa-compress-alt',
+                        color: '#10B981'
+                    });
+                });
+            } catch (e) {
+                console.error('Error loading summaries:', e);
+            }
+
+            // Load tasks
+            try {
+                const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+                const taskGroups = {};
+                tasks.forEach(t => {
+                    const date = new Date(t.createdAt || Date.now()).toDateString();
+                    if (!taskGroups[date]) {
+                        taskGroups[date] = [];
+                    }
+                    taskGroups[date].push(t);
+                });
+
+                Object.keys(taskGroups).forEach(date => {
+                    allFiles.push({
+                        id: `tasks_${date}_${Date.now()}`,
+                        name: `Tasks - ${new Date(date).toLocaleDateString()}`,
+                        type: 'task',
+                        fileType: 'json',
+                        size: JSON.stringify(taskGroups[date]).length,
+                        timestamp: new Date(date).toISOString(),
+                        data: taskGroups[date],
+                        icon: 'fa-tasks',
+                        color: '#F59E0B',
+                        taskCount: taskGroups[date].length
+                    });
+                });
+            } catch (e) {
+                console.error('Error loading tasks:', e);
+            }
+
+            // Sort by date (newest first)
+            allFiles.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            updateStats();
+            filterFiles();
+        }
+
+        // Update statistics
+        function updateStats() {
+            totalFiles.textContent = allFiles.length;
+            
+            const audioFiles = allFiles.filter(f => f.type === 'audio').length;
+            const transcriptFiles = allFiles.filter(f => f.type === 'transcript').length;
+            
+            audioCount.textContent = audioFiles;
+            transcriptCount.textContent = transcriptFiles;
+            
+            // Calculate total hours (rough estimate based on word count)
+            let totalWords = 0;
+            allFiles.forEach(f => {
+                if (f.type === 'transcript' && f.segments) {
+                    f.segments.forEach(s => {
+                        totalWords += s.text?.split(' ').length || 0;
+                    });
+                }
+            });
+            const hours = Math.round(totalWords / 9000 * 10) / 10; // ~150 words per minute
+            totalHours.textContent = hours;
+        }
+
+        // Filter files by type and search
+        function filterFiles() {
+            filteredFiles = allFiles.filter(file => {
+                // Type filter
+                if (currentFilter !== 'all' && file.type !== currentFilter) {
+                    return false;
+                }
+                
+                // Search filter
+                if (searchTerm) {
+                    const nameMatch = file.name.toLowerCase().includes(searchTerm.toLowerCase());
+                    return nameMatch;
+                }
+                
+                return true;
+            });
+            
+            renderFiles();
+        }
+
+        // Filter by type
+        function filterByType(type) {
+            currentFilter = type;
+            
+            // Update active filter
+            document.querySelectorAll('.type-filter').forEach(filter => {
+                filter.classList.remove('active');
+            });
+            document.getElementById(`filter${type.charAt(0).toUpperCase() + type.slice(1)}`).classList.add('active');
+            
+            filterFiles();
+        }
+
+        // Search input handler
+        searchInput.addEventListener('input', (e) => {
+            searchTerm = e.target.value;
+            filterFiles();
+        });
+
+        // Render files list
+        function renderFiles() {
+            if (!filesList) return;
+            
+            if (filteredFiles.length === 0) {
+                filesList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        <p>No files found matching your criteria.</p>
+                        <button class="empty-btn" onclick="location.href='/upload-transcribe'">
+                            <i class="fas fa-upload"></i> Upload Audio
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            filesList.innerHTML = filteredFiles.map(file => `
+                <div class="file-item ${selectedFile?.id === file.id ? 'selected' : ''}" onclick="selectFile('${file.id}')">
+                    <div class="file-header">
+                        <div class="file-icon" style="background: ${file.color}20; color: ${file.color};">
+                            <i class="fas ${file.icon}"></i>
+                        </div>
+                        <div class="file-info">
+                            <div class="file-name">
+                                ${file.name}
+                                <span class="file-type">${file.type}</span>
+                            </div>
+                            <div class="file-meta">
+                                <span><i class="fas fa-clock"></i> ${formatDate(file.timestamp)}</span>
+                                <span><i class="fas fa-file"></i> ${formatSize(file.size)}</span>
+                                ${file.type === 'task' ? `<span><i class="fas fa-list-check"></i> ${file.taskCount || 0} tasks</span>` : ''}
+                                ${file.type === 'transcript' && file.segments ? `<span><i class="fas fa-users"></i> ${file.segments.length} segments</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="file-actions">
+                            <button class="file-action-btn download" onclick="downloadFile('${file.id}', event)" title="Download">
+                                <i class="fas fa-download"></i>
+                            </button>
+                            <button class="file-action-btn" onclick="renameFile('${file.id}', event)" title="Rename">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="file-action-btn delete" onclick="deleteFile('${file.id}', event)" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Select file
+        function selectFile(id) {
+            selectedFile = filteredFiles.find(f => f.id === id);
+            if (!selectedFile) return;
+            
+            // Update UI
+            document.querySelectorAll('.file-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            // Enable buttons
+            downloadBtn.disabled = false;
+            deleteBtn.disabled = false;
+            
+            // Render preview
+            renderPreview();
+        }
+
+        // Render preview based on file type
+        function renderPreview() {
+            if (!selectedFile) return;
+            
+            const file = selectedFile;
+            let previewHtml = '';
+            
+            switch(file.type) {
+                case 'transcript':
+                    previewHtml = renderTranscriptPreview(file);
+                    break;
+                case 'summary':
+                    previewHtml = renderSummaryPreview(file);
+                    break;
+                case 'task':
+                    previewHtml = renderTaskPreview(file);
+                    break;
+                default:
+                    previewHtml = renderGenericPreview(file);
+            }
+            
+            previewContent.innerHTML = previewHtml;
+        }
+
+        // Render transcript preview
+        function renderTranscriptPreview(file) {
+            const segments = file.segments || [];
+            const wordCount = segments.reduce((sum, s) => sum + (s.text?.split(' ').length || 0), 0);
+            const duration = Math.ceil(wordCount / 150); // minutes
+            
+            return `
+                <div class="preview-card">
+                    <div class="preview-title">
+                        <i class="fas fa-file-alt" style="color: #6366F1;"></i>
+                        ${file.name}
+                    </div>
+                    
+                    <div class="preview-meta-grid">
+                        <div class="preview-meta-item">
+                            <div class="meta-label">Created</div>
+                            <div class="meta-value">${new Date(file.timestamp).toLocaleString()}</div>
+                        </div>
+                        <div class="preview-meta-item">
+                            <div class="meta-label">Duration</div>
+                            <div class="meta-value">${duration} minutes</div>
+                        </div>
+                        <div class="preview-meta-item">
+                            <div class="meta-label">Speakers</div>
+                            <div class="meta-value">${new Set(segments.map(s => s.speaker)).size}</div>
+                        </div>
+                        <div class="preview-meta-item">
+                            <div class="meta-label">Words</div>
+                            <div class="meta-value">${wordCount}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="preview-segments">
+                        ${segments.slice(0, 5).map(s => `
+                            <div class="segment-item">
+                                <div class="segment-speaker">
+                                    <i class="fas fa-user-circle"></i>
+                                    ${s.speaker || 'Unknown'}
+                                </div>
+                                <div class="segment-text">${s.text || ''}</div>
+                            </div>
+                        `).join('')}
+                        ${segments.length > 5 ? `
+                            <div style="text-align: center; padding: 16px; color: var(--text-muted);">
+                                <i class="fas fa-ellipsis-h"></i> ${segments.length - 5} more segments
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render summary preview
+        function renderSummaryPreview(file) {
+            const data = file.data;
+            
+            return `
+                <div class="preview-card">
+                    <div class="preview-title">
+                        <i class="fas fa-compress-alt" style="color: #10B981;"></i>
+                        ${file.name}
+                    </div>
+                    
+                    <div class="preview-meta-grid">
+                        <div class="preview-meta-item">
+                            <div class="meta-label">Created</div>
+                            <div class="meta-value">${new Date(file.timestamp).toLocaleString()}</div>
+                        </div>
+                        <div class="preview-meta-item">
+                            <div class="meta-label">Type</div>
+                            <div class="meta-value">${data.type || 'Summary'}</div>
+                        </div>
+                        <div class="preview-meta-item">
+                            <div class="meta-label">Words</div>
+                            <div class="meta-value">${data.wordCount || 0}</div>
+                        </div>
+                        <div class="preview-meta-item">
+                            <div class="meta-label">Read Time</div>
+                            <div class="meta-value">${data.readTime || '1 min'}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--bg-dark); border-radius: 12px; padding: 20px; border: 1px solid var(--border-light);">
+                        <div style="white-space: pre-wrap; line-height: 1.8; color: var(--text-secondary);">
+                            ${data.content || 'No content available'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render task preview
+        function renderTaskPreview(file) {
+            const tasks = file.data || [];
+            const pending = tasks.filter(t => !t.completed).length;
+            const completed = tasks.filter(t => t.completed).length;
+            
+            return `
+                <div class="preview-card">
+                    <div class="preview-title">
+                        <i class="fas fa-tasks" style="color: #F59E0B;"></i>
+                        ${file.name}
+                    </div>
+                    
+                    <div class="preview-meta-grid">
+                        <div class="preview-meta-item">
+                            <div class="meta-label">Total Tasks</div>
+                            <div class="meta-value">${tasks.length}</div>
+                        </div>
+                        <div class="preview-meta-item">
+                            <div class="meta-label">Pending</div>
+                            <div class="meta-value" style="color: var(--accent-warning);">${pending}</div>
+                        </div>
+                        <div class="preview-meta-item">
+                            <div class="meta-label">Completed</div>
+                            <div class="meta-value" style="color: var(--accent-success);">${completed}</div>
+                        </div>
+                        <div class="preview-meta-item">
+                            <div class="meta-label">Completion</div>
+                            <div class="meta-value">${tasks.length ? Math.round((completed/tasks.length)*100) : 0}%</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--bg-dark); border-radius: 12px; padding: 16px; border: 1px solid var(--border-light);">
+                        ${tasks.slice(0, 5).map(t => `
+                            <div style="display: flex; align-items: center; gap: 12px; padding: 12px; border-bottom: 1px solid var(--border-light);">
+                                <div style="width: 8px; height: 8px; border-radius: 50%; background: ${t.completed ? 'var(--accent-success)' : t.priority === 'high' ? 'var(--accent-danger)' : t.priority === 'medium' ? 'var(--accent-warning)' : 'var(--accent-success)'};"></div>
+                                <div style="flex: 1;">
+                                    <div style="font-weight: 500; color: var(--text-primary); margin-bottom: 4px;">${t.title}</div>
+                                    <div style="font-size: 11px; color: var(--text-muted); display: flex; gap: 16px;">
+                                        <span><i class="fas fa-user"></i> ${t.assignee || 'Unassigned'}</span>
+                                        <span><i class="fas fa-calendar"></i> ${t.deadline || 'No deadline'}</span>
+                                    </div>
+                                </div>
+                                <span style="font-size: 11px; padding: 2px 8px; border-radius: 20px; background: ${t.completed ? 'rgba(16, 185, 129, 0.1)' : 'rgba(245, 158, 11, 0.1)'}; color: ${t.completed ? 'var(--accent-success)' : 'var(--accent-warning)'};">
+                                    ${t.completed ? 'Done' : 'Pending'}
+                                </span>
+                            </div>
+                        `).join('')}
+                        ${tasks.length > 5 ? `
+                            <div style="text-align: center; padding: 16px; color: var(--text-muted);">
+                                <i class="fas fa-ellipsis-h"></i> ${tasks.length - 5} more tasks
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render generic preview
+        function renderGenericPreview(file) {
+            return `
+                <div class="preview-card">
+                    <div class="preview-title">
+                        <i class="fas fa-file"></i>
+                        ${file.name}
+                    </div>
+                    
+                    <div class="preview-meta-grid">
+                        <div class="preview-meta-item">
+                            <div class="meta-label">Created</div>
+                            <div class="meta-value">${new Date(file.timestamp).toLocaleString()}</div>
+                        </div>
+                        <div class="preview-meta-item">
+                            <div class="meta-label">Type</div>
+                            <div class="meta-value">${file.type}</div>
+                        </div>
+                        <div class="preview-meta-item">
+                            <div class="meta-label">Size</div>
+                            <div class="meta-value">${formatSize(file.size)}</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--bg-dark); border-radius: 12px; padding: 20px; text-align: center; color: var(--text-muted);">
+                        <i class="fas fa-file" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
+                        <p>Preview not available for this file type</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Download file
+        function downloadFile(id, event) {
+            if (event) event.stopPropagation();
+            
+            const file = allFiles.find(f => f.id === id);
+            if (!file) return;
+            
+            let content = '';
+            let filename = file.name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            
+            switch(file.type) {
+                case 'transcript':
+                    content = JSON.stringify(file.data, null, 2);
+                    filename += '.json';
+                    break;
+                case 'summary':
+                    content = file.data.content || '';
+                    filename += '.txt';
+                    break;
+                case 'task':
+                    content = JSON.stringify(file.data, null, 2);
+                    filename += '.json';
+                    break;
+                default:
+                    content = 'No content available';
+                    filename += '.txt';
+            }
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification(`Downloaded ${file.name}`, 'success');
+        }
+
+        // Delete file
+        function deleteFile(id, event) {
+            if (event) event.stopPropagation();
+            
+            if (!confirm('Are you sure you want to delete this file?')) return;
+            
+            const file = allFiles.find(f => f.id === id);
+            if (!file) return;
+            
+            // Remove from appropriate storage
+            switch(file.type) {
+                case 'transcript':
+                    const transcripts = JSON.parse(localStorage.getItem('transcripts')) || [];
+                    const newTranscripts = transcripts.filter(t => t.id !== file.data.id);
+                    localStorage.setItem('transcripts', JSON.stringify(newTranscripts));
+                    break;
+                case 'summary':
+                    const summaries = JSON.parse(localStorage.getItem('summaries')) || [];
+                    const newSummaries = summaries.filter(s => s.id !== file.data.id);
+                    localStorage.setItem('summaries', JSON.stringify(newSummaries));
+                    break;
+                case 'task':
+                    // Tasks are grouped by date, so we need to remove individual tasks
+                    const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+                    // For task files, file.data is an array of tasks for that date
+                    // We need to remove those specific tasks
+                    const taskIds = file.data.map(t => t.id);
+                    const newTasks = tasks.filter(t => !taskIds.includes(t.id));
+                    localStorage.setItem('tasks', JSON.stringify(newTasks));
+                    break;
+            }
+            
+            // Reload files
+            loadAllFiles();
+            
+            // Clear selection if current file was deleted
+            if (selectedFile?.id === id) {
+                selectedFile = null;
+                downloadBtn.disabled = true;
+                deleteBtn.disabled = true;
+                previewContent.innerHTML = `
+                    <div class="preview-placeholder">
+                        <i class="fas fa-file-circle-plus"></i>
+                        <p>Select a file to preview its contents</p>
+                    </div>
+                `;
+            }
+            
+            showNotification('File deleted successfully', 'success');
+        }
+
+        // Rename file
+        function renameFile(id, event) {
+            if (event) event.stopPropagation();
+            
+            const file = allFiles.find(f => f.id === id);
+            if (!file) return;
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'renameModal';
+            
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-edit"></i> Rename File</h3>
+                        <button class="close-modal" onclick="closeModal('renameModal')">&times;</button>
+                    </div>
+                    <div class="modal-field">
+                        <label>New Name</label>
+                        <input type="text" id="newFileName" value="${file.name}" placeholder="Enter new name...">
+                    </div>
+                    <div class="modal-actions">
+                        <button class="modal-btn primary" onclick="saveNewName('${id}')">Save</button>
+                        <button class="modal-btn secondary" onclick="closeModal('renameModal')">Cancel</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        // Save new name
+        function saveNewName(id) {
+            const newName = document.getElementById('newFileName')?.value.trim();
+            if (!newName) {
+                showNotification('Please enter a name', 'error');
+                return;
+            }
+            
+            const file = allFiles.find(f => f.id === id);
+            if (!file) return;
+            
+            // Update in appropriate storage
+            switch(file.type) {
+                case 'transcript':
+                    const transcripts = JSON.parse(localStorage.getItem('transcripts')) || [];
+                    const transcript = transcripts.find(t => t.id === file.data.id);
+                    if (transcript) {
+                        transcript.name = newName;
+                        localStorage.setItem('transcripts', JSON.stringify(transcripts));
+                    }
+                    break;
+                case 'summary':
+                    const summaries = JSON.parse(localStorage.getItem('summaries')) || [];
+                    const summary = summaries.find(s => s.id === file.data.id);
+                    if (summary) {
+                        summary.title = newName;
+                        localStorage.setItem('summaries', JSON.stringify(summaries));
+                    }
+                    break;
+            }
+            
+            file.name = newName;
+            renderFiles();
+            if (selectedFile?.id === id) {
+                renderPreview();
+            }
+            
+            closeModal('renameModal');
+            showNotification('File renamed successfully', 'success');
+        }
+
+        // Download current file
+        function downloadCurrentFile() {
+            if (selectedFile) {
+                downloadFile(selectedFile.id);
+            }
+        }
+
+        // Delete current file
+        function deleteCurrentFile() {
+            if (selectedFile) {
+                deleteFile(selectedFile.id);
+            }
+        }
+
+        // Refresh files
+        function refreshFiles() {
+            loadAllFiles();
+            showNotification('Files refreshed', 'success');
+        }
+
+        // Clear all files
+        function clearAllFiles() {
+            if (!confirm('Are you sure you want to delete ALL files? This action cannot be undone.')) return;
+            
+            localStorage.removeItem('transcripts');
+            localStorage.removeItem('summaries');
+            localStorage.removeItem('tasks');
+            
+            loadAllFiles();
+            selectedFile = null;
+            downloadBtn.disabled = true;
+            deleteBtn.disabled = true;
+            previewContent.innerHTML = `
+                <div class="preview-placeholder">
+                    <i class="fas fa-file-circle-plus"></i>
+                    <p>Select a file to preview its contents</p>
+                </div>
+            `;
+            
+            showNotification('All files cleared', 'success');
+        }
+
+        // Format date
+        function formatDate(timestamp) {
+            try {
+                const date = new Date(timestamp);
+                const now = new Date();
+                const diffDays = Math.ceil(Math.abs(now - date) / (1000 * 60 * 60 * 24));
+                
+                if (diffDays === 0) return 'Today';
+                if (diffDays === 1) return 'Yesterday';
+                if (diffDays < 7) return `${diffDays} days ago`;
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+            } catch (e) {
+                return 'Unknown date';
+            }
+        }
+
+        // Format file size
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        // Close modal
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) modal.remove();
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? 'linear-gradient(135deg, #10B981, #34D399)' : type === 'error' ? 'linear-gradient(135deg, #EF4444, #F87171)' : 'linear-gradient(135deg, #6366F1, #8B5CF6)'};
+                color: white;
+                padding: 12px 24px;
+                border-radius: 40px;
+                box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+                z-index: 10001;
+                font-weight: 500;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                animation: slideInRight 0.3s ease;
+            `;
+            
+            notification.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOutRight 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userEmail');
+            window.location.href = '/';
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAllFiles();
+            
+            // Make functions globally available
+            window.filterByType = filterByType;
+            window.downloadFile = downloadFile;
+            window.deleteFile = deleteFile;
+            window.renameFile = renameFile;
+            window.selectFile = selectFile;
+            window.downloadCurrentFile = downloadCurrentFile;
+            window.deleteCurrentFile = deleteCurrentFile;
+            window.refreshFiles = refreshFiles;
+            window.clearAllFiles = clearAllFiles;
+            window.saveNewName = saveNewName;
+            window.closeModal = closeModal;
+        });
+    </script>
+</body>
+</html>

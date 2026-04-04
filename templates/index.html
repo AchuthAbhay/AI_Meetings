@@ -1,0 +1,1184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InsightFlow: AI-Powered Audio Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #dbeafe 100%);
+        }
+        .dark-section {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.2), 0 10px 10px -5px rgba(59, 130, 246, 0.1);
+        }
+        .glow-border {
+            position: relative;
+        }
+        .glow-border::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 0.5rem;
+            padding: 2px;
+            background: linear-gradient(45deg, #3b82f6, #8b5cf6);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .glow-border:hover::before {
+            opacity: 1;
+        }
+        .pricing-card:hover {
+            transform: scale(1.03);
+        }
+        .highlight-card {
+            box-shadow: 0 0 20px 5px rgba(59, 130, 246, 0.3);
+        }
+        .toggle-bg:after {
+            content: '';
+            position: absolute;
+            top: 0.125rem;
+            left: 0.125rem;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 9999px;
+            height: 1.25rem;
+            width: 1.25rem;
+            transition: transform 0.3s;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        input:checked + .toggle-bg:after {
+            transform: translateX(100%);
+            border-color: white;
+        }
+        input:checked + .toggle-bg {
+            background-color: #2563eb;
+            border-color: #2563eb;
+        }
+        .faq-item {
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+        .faq-question {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+        }
+        .faq-item.active .faq-question {
+            color: #3b82f6;
+        }
+        .faq-icon {
+            transition: transform 0.3s ease;
+        }
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Modern Tech Workspace Animation Styles */
+        .tech-workspace {
+            position: relative;
+            width: 100%;
+            height: 450px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        .main-screen {
+            position: absolute;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 180px;
+            background: #0f172a;
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .screen-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #0f172a, #1e293b);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #3b82f6;
+            font-size: 12px;
+        }
+
+        .ai-processing {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(59, 130, 246, 0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: white;
+            font-size: 12px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .workspace-desks {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 40px;
+        }
+
+        .desk {
+            position: relative;
+            width: 120px;
+            height: 80px;
+            background: #374151;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        .laptop {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 50px;
+            background: #1f2937;
+            border-radius: 6px 6px 0 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .person {
+            position: absolute;
+            width: 30px;
+            height: 40px;
+            background: #3b82f6;
+            border-radius: 15px 15px 5px 5px;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: person-work 3s ease-in-out infinite;
+        }
+
+        .person-1 { background: #3b82f6; animation-delay: 0s; }
+        .person-2 { background: #8b5cf6; animation-delay: 0.5s; }
+        .person-3 { background: #06b6d4; animation-delay: 1s; }
+
+        .data-flow {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            animation: data-flow 4s linear infinite;
+        }
+
+        .flow-1 { top: 120px; left: 30%; animation-delay: 0s; }
+        .flow-2 { top: 150px; left: 40%; animation-delay: 1s; }
+        .flow-3 { top: 180px; left: 50%; animation-delay: 2s; }
+        .flow-4 { top: 150px; left: 60%; animation-delay: 3s; }
+        .flow-5 { top: 120px; left: 70%; animation-delay: 4s; }
+
+        .insight-card {
+            position: absolute;
+            top: 250px;
+            right: 40px;
+            width: 140px;
+            height: 80px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            padding: 12px;
+            animation: card-float 6s ease-in-out infinite;
+        }
+
+        .stats-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            gap: 15px;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 8px;
+            color: white;
+            font-size: 11px;
+            animation: stat-pulse 4s ease-in-out infinite;
+        }
+
+        .stat-1 { animation-delay: 0s; }
+        .stat-2 { animation-delay: 1s; }
+        .stat-3 { animation-delay: 2s; }
+
+        @keyframes person-work {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.05); }
+        }
+
+        @keyframes data-flow {
+            0% { transform: translateY(0) scale(1); opacity: 0; }
+            50% { transform: translateY(-100px) scale(1.5); opacity: 1; }
+            100% { transform: translateY(-200px) scale(1); opacity: 0; }
+        }
+
+        @keyframes card-float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-10px) rotate(2deg); }
+            66% { transform: translateY(5px) rotate(-1deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes stat-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .code-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: rgba(59, 130, 246, 0.3);
+            animation: code-scan 3s linear infinite;
+        }
+
+        @keyframes code-scan {
+            0% { top: 0; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-white/80 backdrop-blur-md shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i data-feather="activity" class="h-8 w-8 text-blue-600"></i>
+                        <span class="ml-2 text-xl font-bold text-gray-900">Insight<span class="gradient-text">Flow</span></span>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-center space-x-8">
+                        <a href="#features" class="text-gray-700 hover:text-blue-600 font-medium transition">Features</a>
+                        <a href="#how-it-works" class="text-gray-700 hover:text-blue-600 font-medium transition">How It Works</a>
+                        <a href="#domains" class="text-gray-700 hover:text-blue-600 font-medium transition">Domains</a>
+                        <a href="#pricing" class="text-gray-700 hover:text-blue-600 font-medium transition">Pricing</a>
+                        <a href="#faq" class="text-gray-700 hover:text-blue-600 font-medium transition">FAQ</a>
+                        <a href="#contact" class="text-gray-700 hover:text-blue-600 font-medium transition">Contact</a>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/login" class="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition">Log in</a>
+                    <a href="/signup" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition shadow-sm">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient pt-32 pb-20 px-4 sm:px-6 lg:px-8" id="home">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <!-- Text Content -->
+                <div class="space-y-8" data-aos="fade-right">
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+                        <span class="gradient-text">InsightFlow:</span> Smarter Conversations, Real-Time Intelligence
+                    </h1>
+                    <p class="text-lg md:text-xl text-gray-700">
+                        Transform any conversation into structured insights with AI-powered transcription, summaries, and action tracking across lectures, interviews, and professional discussions.
+                    </p>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="/signup" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-md transition transform hover:-translate-y-1">
+                            Get Started
+                        </a>
+                        <a href="#features" class="px-6 py-3 border border-gray-300 hover:border-blue-400 text-gray-700 font-medium rounded-lg shadow-sm transition flex items-center gap-2">
+                            <i data-feather="play-circle" class="w-5 h-5"></i> Watch Demo
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Modern Tech Workspace Animation -->
+                <div data-aos="fade-left" class="tech-workspace">
+                    <!-- Main Screen -->
+                    <div class="main-screen">
+                        <div class="screen-content">
+                            <div class="ai-processing">
+                                <i data-feather="cpu" class="w-3 h-3 inline mr-1"></i>
+                                AI Processing Audio
+                            </div>
+                            <div class="text-center">
+                                <i data-feather="activity" class="w-8 h-8 mb-2 text-green-400"></i>
+                                <div class="text-white font-semibold">Generating Insights</div>
+                                <div class="text-blue-300 text-xs mt-1">98% Accuracy</div>
+                            </div>
+                            <div class="code-line" style="animation-delay: 0s;"></div>
+                            <div class="code-line" style="animation-delay: 1s;"></div>
+                            <div class="code-line" style="animation-delay: 2s;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Workspace Desks with People -->
+                    <div class="workspace-desks">
+                        <div class="desk">
+                            <div class="laptop"></div>
+                            <div class="person person-1"></div>
+                        </div>
+                        <div class="desk">
+                            <div class="laptop"></div>
+                            <div class="person person-2"></div>
+                        </div>
+                        <div class="desk">
+                            <div class="laptop"></div>
+                            <div class="person person-3"></div>
+                        </div>
+                    </div>
+
+                    <!-- Data Flow Animation -->
+                    <div class="data-flow flow-1"></div>
+                    <div class="data-flow flow-2"></div>
+                    <div class="data-flow flow-3"></div>
+                    <div class="data-flow flow-4"></div>
+                    <div class="data-flow flow-5"></div>
+
+                    <!-- Insight Card -->
+                    <div class="insight-card">
+                        <div class="flex items-center mb-2">
+                            <i data-feather="zap" class="w-4 h-4 text-blue-500 mr-2"></i>
+                            <span class="text-sm font-semibold text-gray-800">Key Insights</span>
+                        </div>
+                        <div class="text-xs text-gray-600">
+                            • Action items identified<br>
+                            • Sentiment: Positive<br>
+                            • 5 decisions recorded
+                        </div>
+                    </div>
+
+                    <!-- Stats Panel -->
+                    <div class="stats-panel">
+                        <div class="stat-item stat-1">
+                            <i data-feather="mic" class="w-3 h-3 inline mr-1"></i>
+                            95% Accuracy
+                        </div>
+                        <div class="stat-item stat-2">
+                            <i data-feather="clock" class="w-3 h-3 inline mr-1"></i>
+                            Real-time
+                        </div>
+                        <div class="stat-item stat-3">
+                            <i data-feather="globe" class="w-3 h-3 inline mr-1"></i>
+                            50+ Languages
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Us Section -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">About InsightFlow</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                    We're revolutionizing how organizations extract value from conversations using cutting-edge AI technology.
+                </p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8" data-aos="fade-up" data-aos-delay="100">
+                <div class="bg-gray-50 p-8 rounded-xl hover:shadow-lg transition">
+                    <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
+                        <i data-feather="target" class="w-6 h-6 text-blue-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Our Mission</h3>
+                    <p class="text-gray-600">
+                        To transform spoken communication into actionable intelligence, making every conversation more productive and valuable across all domains.
+                    </p>
+                </div>
+                <div class="bg-gray-50 p-8 rounded-xl hover:shadow-lg transition">
+                    <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-6">
+                        <i data-feather="eye" class="w-6 h-6 text-purple-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Our Vision</h3>
+                    <p class="text-gray-600">
+                        A world where no insight is lost in conversation, and every discussion leads to measurable outcomes and continuous improvement.
+                    </p>
+                </div>
+                <div class="bg-gray-50 p-8 rounded-xl hover:shadow-lg transition">
+                    <div class="w-12 h-12 bg-cyan-100 rounded-lg flex items-center justify-center mb-6">
+                        <i data-feather="award" class="w-6 h-6 text-cyan-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-3">Why Choose Us</h3>
+                    <p class="text-gray-600">
+                        Enterprise-grade AI technology, privacy-focused design, and seamless integration with your existing tools and workflows.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50" id="features">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Powerful Features</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                    Everything you need to transform conversations into actionable insights
+                </p>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6" data-aos="fade-up" data-aos-delay="100">
+                <!-- Feature Cards -->
+                <div class="feature-card bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition duration-300">
+                    <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                        <i data-feather="mic" class="w-5 h-5 text-blue-600"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Real-Time Transcription</h3>
+                    <p class="text-gray-600 text-sm">
+                        Accurate speech-to-text conversion for lectures, interviews, and discussions with industry-leading accuracy.
+                    </p>
+                </div>
+                <div class="feature-card bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition duration-300">
+                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                        <i data-feather="users" class="w-5 h-5 text-purple-600"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Speaker Identification</h3>
+                    <p class="text-gray-600 text-sm">
+                        Automatically distinguishes between speakers for clear attribution in transcripts and summaries.
+                    </p>
+                </div>
+                <div class="feature-card bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition duration-300">
+                    <div class="w-10 h-10 bg-cyan-100 rounded-lg flex items-center justify-center mb-4">
+                        <i data-feather="file-text" class="w-5 h-5 text-cyan-600"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Smart Summarization</h3>
+                    <p class="text-gray-600 text-sm">
+                        AI-generated concise summaries highlighting key points, decisions, and important discussions.
+                    </p>
+                </div>
+                <div class="feature-card bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition duration-300">
+                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                        <i data-feather="check-square" class="w-5 h-5 text-green-600"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Action Item Tracking</h3>
+                    <p class="text-gray-600 text-sm">
+                        Automatic detection and assignment of action items with deadlines and responsible parties.
+                    </p>
+                </div>
+                <div class="feature-card bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition duration-300">
+                    <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
+                        <i data-feather="smile" class="w-5 h-5 text-yellow-600"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Sentiment Analysis</h3>
+                    <p class="text-gray-600 text-sm">
+                        Detects emotional tone and engagement levels throughout conversations in real-time.
+                    </p>
+                </div>
+                <div class="feature-card bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-lg transition duration-300">
+                    <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mb-4">
+                        <i data-feather="globe" class="w-5 h-5 text-red-600"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">Multi-Language Support</h3>
+                    <p class="text-gray-600 text-sm">
+                        Supports transcription and analysis in 50+ languages with native-level accuracy.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-white" id="how-it-works">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">How InsightFlow Works</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                    Transform your conversations into actionable insights in just four simple steps
+                </p>
+            </div>
+            <div class="grid md:grid-cols-4 gap-8 relative" data-aos="fade-up" data-aos-delay="100">
+                <!-- Steps -->
+                <div class="relative z-10">
+                    <div class="bg-blue-50 p-6 rounded-xl h-full">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4 mx-auto">
+                            <span class="text-blue-600 font-bold">1</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-2 text-center">Record/Upload</h3>
+                        <p class="text-gray-600 text-sm text-center">
+                            Start by recording live or uploading existing audio/video files from any source.
+                        </p>
+                    </div>
+                </div>
+                <div class="relative z-10">
+                    <div class="bg-purple-50 p-6 rounded-xl h-full">
+                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-4 mx-auto">
+                            <span class="text-purple-600 font-bold">2</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-2 text-center">AI Processing</h3>
+                        <p class="text-gray-600 text-sm text-center">
+                            Our advanced AI analyzes speech, identifies speakers, and extracts key information.
+                        </p>
+                    </div>
+                </div>
+                <div class="relative z-10">
+                    <div class="bg-cyan-50 p-6 rounded-xl h-full">
+                        <div class="w-12 h-12 bg-cyan-100 rounded-full flex items-center justify-center mb-4 mx-auto">
+                            <span class="text-cyan-600 font-bold">3</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-2 text-center">Generate Insights</h3>
+                        <p class="text-gray-600 text-sm text-center">
+                            Receive structured transcripts with summaries, decisions, and key points.
+                        </p>
+                    </div>
+                </div>
+                <div class="relative z-10">
+                    <div class="bg-green-50 p-6 rounded-xl h-full">
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4 mx-auto">
+                            <span class="text-green-600 font-bold">4</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-2 text-center">Take Action</h3>
+                        <p class="text-gray-600 text-sm text-center">
+                            Action items are automatically identified and assigned with deadlines.
+                        </p>
+                    </div>
+                </div>
+                <div class="hidden md:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-blue-200 via-purple-200 to-green-200 transform -translate-y-1/2 z-0"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Domains Section -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 dark-section" id="domains">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Domains & Use Cases</h2>
+                <p class="text-lg text-gray-300 max-w-3xl mx-auto">
+                    InsightFlow transforms conversations across multiple professional domains
+                </p>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6" data-aos="fade-up" data-aos-delay="100">
+                <!-- Domain Cards -->
+                <div class="glow-border bg-gray-800 p-6 rounded-xl hover:shadow-lg transition duration-300 group">
+                    <div class="w-12 h-12 bg-blue-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-900/50 transition">
+                        <i data-feather="users" class="w-6 h-6 text-blue-400"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Business & Corporate</h3>
+                    <p class="text-gray-400 text-sm">
+                        Automatically document decisions and action items from team discussions and client conversations.
+                    </p>
+                </div>
+                <div class="glow-border bg-gray-800 p-6 rounded-xl hover:shadow-lg transition duration-300 group">
+                    <div class="w-12 h-12 bg-purple-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:bg-purple-900/50 transition">
+                        <i data-feather="book" class="w-6 h-6 text-purple-400"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Education & Academia</h3>
+                    <p class="text-gray-400 text-sm">
+                        Create searchable lecture transcripts and highlight key concepts for students and researchers.
+                    </p>
+                </div>
+                <div class="glow-border bg-gray-800 p-6 rounded-xl hover:shadow-lg transition duration-300 group">
+                    <div class="w-12 h-12 bg-cyan-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:bg-cyan-900/50 transition">
+                        <i data-feather="search" class="w-6 h-6 text-cyan-400"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Research & Interviews</h3>
+                    <p class="text-gray-400 text-sm">
+                        Analyze interviews, focus groups, and academic discussions with precision and thematic analysis.
+                    </p>
+                </div>
+                <div class="glow-border bg-gray-800 p-6 rounded-xl hover:shadow-lg transition duration-300 group">
+                    <div class="w-12 h-12 bg-green-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:bg-green-900/50 transition">
+                        <i data-feather="mic" class="w-6 h-6 text-green-400"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-2">Media & Content</h3>
+                    <p class="text-gray-400 text-sm">
+                        Automate transcription and content analysis for media production and content creation workflows.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 dark-section" id="pricing">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Simple, Transparent Pricing</h2>
+                <p class="text-lg text-gray-300 max-w-3xl mx-auto">
+                    Choose the plan that fits your needs
+                </p>
+            </div>
+            
+            <div class="flex justify-center mb-12" data-aos="fade-up">
+                <div class="flex items-center">
+                    <span class="mr-3 text-gray-300 font-medium">Monthly</span>
+                    <label class="flex items-center cursor-pointer">
+                        <div class="relative">
+                            <input type="checkbox" class="sr-only" id="pricing-toggle">
+                            <div class="toggle-bg bg-gray-700 border border-gray-600 h-6 w-11 rounded-full"></div>
+                        </div>
+                        <span class="ml-3 text-gray-300 font-medium">Yearly <span class="text-blue-400">(Save 20%)</span></span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8" data-aos="fade-up" data-aos-delay="100">
+                <!-- Free Plan -->
+                <div class="pricing-card bg-gray-800 p-8 rounded-xl border border-gray-700 hover:border-blue-500 transition duration-300">
+                    <h3 class="text-xl font-bold text-white mb-2">Free Trial</h3>
+                    <p class="text-gray-400 mb-6">Perfect for trying out basic features</p>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold text-white">$0</span>
+                        <span class="text-gray-400">/month</span>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-400 mr-2"></i>
+                            <span class="text-gray-300">5 hours transcription/month</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-400 mr-2"></i>
+                            <span class="text-gray-300">Basic summaries</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-400 mr-2"></i>
+                            <span class="text-gray-300">Speaker identification</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="x" class="w-4 h-4 text-gray-600 mr-2"></i>
+                            <span class="text-gray-500">Multi-language support</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="x" class="w-4 h-4 text-gray-600 mr-2"></i>
+                            <span class="text-gray-500">Sentiment analysis</span>
+                        </li>
+                    </ul>
+                    <a href="/signup" class="block w-full py-3 px-4 text-center bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition">
+                        Get Started
+                    </a>
+                </div>
+                
+                <!-- Pro Plan (Highlighted) -->
+                <div class="pricing-card bg-gray-800 p-8 rounded-xl border-2 border-blue-500 highlight-card transition duration-300 transform hover:scale-105">
+                    <div class="absolute top-0 right-0 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg">
+                        POPULAR
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Pro Plan</h3>
+                    <p class="text-gray-400 mb-6">For professionals and small teams</p>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold text-white">$29</span>
+                        <span class="text-gray-400">/month</span>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-400 mr-2"></i>
+                            <span class="text-gray-300">20 hours transcription/month</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-400 mr-2"></i>
+                            <span class="text-gray-300">Smart summaries</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-400 mr-2"></i>
+                            <span class="text-gray-300">Action item tracking</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-400 mr-2"></i>
+                            <span class="text-gray-300">Multi-language support</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-400 mr-2"></i>
+                            <span class="text-gray-300">Sentiment analysis</span>
+                        </li>
+                    </ul>
+                    <a href="/signup" class="block w-full py-3 px-4 text-center bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-lg transition shadow-lg">
+                        Get Started
+                    </a>
+                </div>
+                
+                <!-- Enterprise Plan -->
+                <div class="pricing-card bg-gray-800 p-8 rounded-xl border border-gray-700 hover:border-purple-500 transition duration-300">
+                    <h3 class="text-xl font-bold text-white mb-2">Enterprise</h3>
+                    <p class="text-gray-400 mb-6">For large organizations</p>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold text-white">Custom</span>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-400 mr-2"></i>
+                            <span class="text-gray-300">Unlimited transcription</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-400 mr-2"></i>
+                            <span class="text-gray-300">Advanced analytics</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-400 mr-2"></i>
+                            <span class="text-gray-300">Custom dashboards</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-400 mr-2"></i>
+                            <span class="text-gray-300">API access</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i data-feather="check" class="w-4 h-4 text-green-400 mr-2"></i>
+                            <span class="text-gray-300">Dedicated support</span>
+                        </li>
+                    </ul>
+                    <a href="/signup" class="block w-full py-3 px-4 text-center bg-gray-700 hover:bg-gray-600 text-white font-medium rounded-lg transition">
+                        Contact Sales
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-gray-50" id="faq">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                    Get answers to common questions about InsightFlow
+                </p>
+            </div>
+            
+            <div class="space-y-4" data-aos="fade-up" data-aos-delay="100">
+                <!-- FAQ Item 1 -->
+                <div class="faq-item bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition">
+                    <div class="faq-question flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900">How accurate is the speech-to-text transcription?</h3>
+                        <i data-feather="chevron-down" class="faq-icon w-5 h-5 text-gray-500"></i>
+                    </div>
+                    <div class="faq-answer mt-4">
+                        <p class="text-gray-600">
+                            InsightFlow uses state-of-the-art AI models with industry-leading accuracy of 95%+ for clear audio. Accuracy may vary based on audio quality, background noise, accents, and technical terminology. For best results, ensure good microphone quality and minimal background noise.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 2 -->
+                <div class="faq-item bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition">
+                    <div class="faq-question flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900">What file formats do you support for upload?</h3>
+                        <i data-feather="chevron-down" class="faq-icon w-5 h-5 text-gray-500"></i>
+                    </div>
+                    <div class="faq-answer mt-4">
+                        <p class="text-gray-600">
+                            We support all major audio formats including MP3, WAV, M4A, and video formats like MP4 and MOV. For real-time recording, we work with any standard microphone input. Maximum file size is 2GB for uploads, with no limits on real-time recording duration.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 3 -->
+                <div class="faq-item bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition">
+                    <div class="faq-question flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900">How does speaker identification work?</h3>
+                        <i data-feather="chevron-down" class="faq-icon w-5 h-5 text-gray-500"></i>
+                    </div>
+                    <div class="faq-answer mt-4">
+                        <p class="text-gray-600">
+                            Our AI analyzes voice characteristics, speech patterns, and conversation flow to distinguish between different speakers. For optimal results, we recommend having at least 30 seconds of continuous speech from each speaker. You can also manually label speakers in the interface for improved accuracy.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 4 -->
+                <div class="faq-item bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition">
+                    <div class="faq-question flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900">Is my data secure and private?</h3>
+                        <i data-feather="chevron-down" class="faq-icon w-5 h-5 text-gray-500"></i>
+                    </div>
+                    <div class="faq-answer mt-4">
+                        <p class="text-gray-600">
+                            Absolutely. We use end-to-end encryption for all data transfers and storage. Your audio files and transcripts are never shared with third parties. We comply with GDPR, CCPA, and other privacy regulations. Enterprise customers can opt for on-premises deployment for additional security.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 5 -->
+                <div class="faq-item bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition">
+                    <div class="faq-question flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900">What languages do you support?</h3>
+                        <i data-feather="chevron-down" class="faq-icon w-5 h-5 text-gray-500"></i>
+                    </div>
+                    <div class="faq-answer mt-4">
+                        <p class="text-gray-600">
+                            We currently support over 50 languages including English, Spanish, French, German, Chinese, Japanese, Korean, Hindi, and Arabic. Multi-language support is available on Pro and Enterprise plans. We're continuously adding new languages based on user demand.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- FAQ Item 6 -->
+                <div class="faq-item bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition">
+                    <div class="faq-question flex justify-between items-center">
+                        <h3 class="text-lg font-semibold text-gray-900">How does the free trial work?</h3>
+                        <i data-feather="chevron-down" class="faq-icon w-5 h-5 text-gray-500"></i>
+                    </div>
+                    <div class="faq-answer mt-4">
+                        <p class="text-gray-600">
+                            The free trial includes 5 hours of transcription per month with access to basic features. No credit card required to start. You can upgrade to a paid plan at any time to unlock additional features and higher transcription limits. The free trial renews monthly.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-12" data-aos="fade-up">
+                <p class="text-gray-600 mb-6">Still have questions? We're here to help!</p>
+                <a href="#contact" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition shadow-sm">
+                    Contact Support
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Get in Touch Section -->
+    <section class="py-20 px-4 sm:px-6 lg:px-8 bg-white" id="contact">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Get in Touch</h2>
+                <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                    Ready to transform how you handle conversations? Let's discuss how InsightFlow can help your organization.
+                </p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-12 items-start">
+                <div data-aos="fade-right">
+                    <div class="bg-gradient-to-br from-blue-50 to-purple-50 p-8 rounded-2xl shadow-sm">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-6">Let's Start a Conversation</h3>
+                        <div class="space-y-6">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                                        <i data-feather="mail" class="w-6 h-6 text-blue-600"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="text-lg font-semibold text-gray-900">Email Us</h4>
+                                    <p class="text-gray-600">hello@insightflow.ai</p>
+                                    <p class="text-gray-500 text-sm mt-1">Typically respond within 2 hours</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                                        <i data-feather="phone" class="w-6 h-6 text-purple-600"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="text-lg font-semibold text-gray-900">Call Us</h4>
+                                    <p class="text-gray-600">+1 (555) 123-4567</p>
+                                    <p class="text-gray-500 text-sm mt-1">Mon-Fri, 9AM-6PM EST</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <div class="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center">
+                                        <i data-feather="map-pin" class="w-6 h-6 text-cyan-600"></i>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <h4 class="text-lg font-semibold text-gray-900">Visit Us</h4>
+                                    <p class="text-gray-600">123 Innovation Drive, San Francisco, CA 94107</p>
+                                    <p class="text-gray-500 text-sm mt-1">Schedule a visit to our offices</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8 pt-6 border-t border-gray-200">
+                            <h4 class="font-semibold text-gray-900 mb-4">Connect With Us</h4>
+                            <div class="flex space-x-4">
+                                <a href="#" class="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center transition hover:shadow-md">
+                                    <i data-feather="twitter" class="w-5 h-5 text-gray-700"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center transition hover:shadow-md">
+                                    <i data-feather="linkedin" class="w-5 h-5 text-gray-700"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center transition hover:shadow-md">
+                                    <i data-feather="github" class="w-5 h-5 text-gray-700"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div data-aos="fade-left">
+                    <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
+                        <h3 class="text-2xl font-bold text-gray-900 mb-6">Send us a Message</h3>
+                        <form id="contactForm" class="space-y-6">
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                                    <input type="text" id="name" name="name" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Your name" required>
+                                </div>
+                                <div>
+                                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                                    <input type="email" id="email" name="email" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="your.email@company.com" required>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label for="company" class="block text-sm font-medium text-gray-700 mb-2">Company</label>
+                                <input type="text" id="company" name="company" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Your company name">
+                            </div>
+                            
+                            <div>
+                                <label for="interest" class="block text-sm font-medium text-gray-700 mb-2">I'm interested in</label>
+                                <select id="interest" name="interest" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+                                    <option value="">Select an option</option>
+                                    <option value="enterprise">Enterprise Solution</option>
+                                    <option value="team">Team Plan</option>
+                                    <option value="partnership">Partnership</option>
+                                    <option value="demo">Product Demo</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label for="message" class="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                                <textarea id="message" name="message" rows="5" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Tell us about your needs and how we can help..." required></textarea>
+                            </div>
+                            
+                            <button type="submit" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition shadow-lg hover:shadow-xl flex items-center justify-center">
+                                <span id="submitText">Send Message</span>
+                                <div id="loadingSpinner" class="hidden ml-2">
+                                    <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                                </div>
+                            </button>
+                            <div id="formMessage" class="mt-4 text-center hidden"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-4 sm:px-6 lg:px-8 dark-section">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center mb-4">
+                        <i data-feather="activity" class="h-6 w-6 text-blue-400"></i>
+                        <span class="ml-2 text-xl font-bold text-white">Insight<span class="gradient-text">Flow</span></span>
+                    </div>
+                    <p class="text-gray-400 text-sm">
+                        AI-powered real-time audio intelligence that transforms conversations into structured insights across all professional domains.
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Product</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#features" class="text-gray-400 hover:text-white transition">Features</a></li>
+                        <li><a href="#how-it-works" class="text-gray-400 hover:text-white transition">How It Works</a></li>
+                        <li><a href="#pricing" class="text-gray-400 hover:text-white transition">Pricing</a></li>
+                        <li><a href="#faq" class="text-gray-400 hover:text-white transition">FAQ</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Company</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Careers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Blog</a></li>
+                        <li><a href="#contact" class="text-gray-400 hover:text-white transition">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4">Legal</h3>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Terms of Service</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Security</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">GDPR</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm mb-4 md:mb-0">
+                    © 2025 InsightFlow. All rights reserved.
+                </p>
+                <div class="flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white transition">
+                        <i data-feather="twitter" class="w-5 h-5"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition">
+                        <i data-feather="linkedin" class="w-5 h-5"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition">
+                        <i data-feather="facebook" class="w-5 h-5"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition">
+                        <i data-feather="github" class="w-5 h-5"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+        
+        feather.replace();
+        
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // Toggle pricing plan
+        const toggle = document.getElementById('pricing-toggle');
+        const monthlyPrice = document.querySelectorAll('.pricing-card:nth-child(1) span.text-4xl');
+        const yearlyPrice = document.querySelectorAll('.pricing-card:nth-child(2) span.text-4xl');
+        
+        if (toggle) {
+            toggle.addEventListener('change', function() {
+                if(this.checked) {
+                    monthlyPrice.forEach(el => el.textContent = '$0');
+                    yearlyPrice.forEach(el => el.textContent = '$24');
+                } else {
+                    monthlyPrice.forEach(el => el.textContent = '$0');
+                    yearlyPrice.forEach(el => el.textContent = '$29');
+                }
+            });
+        }
+
+        // FAQ Accordion functionality
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const faqItem = question.parentElement;
+                const isActive = faqItem.classList.contains('active');
+                
+                // Close all other FAQ items
+                document.querySelectorAll('.faq-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                // Toggle current item
+                if (!isActive) {
+                    faqItem.classList.add('active');
+                }
+            });
+        });
+
+        // Contact form handling
+        document.addEventListener('DOMContentLoaded', function() {
+            const contactForm = document.getElementById('contactForm');
+            const submitText = document.getElementById('submitText');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const formMessage = document.getElementById('formMessage');
+            
+            if (contactForm) {
+                contactForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const formData = {
+                        name: document.getElementById('name').value,
+                        email: document.getElementById('email').value,
+                        company: document.getElementById('company').value,
+                        interest: document.getElementById('interest').value,
+                        message: document.getElementById('message').value
+                    };
+                    
+                    // Show loading state
+                    submitText.textContent = 'Sending...';
+                    loadingSpinner.classList.remove('hidden');
+                    contactForm.querySelector('button').disabled = true;
+                    formMessage.classList.add('hidden');
+                    
+                    try {
+                        const response = await fetch('/api/contact', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(formData)
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            // Show success message
+                            formMessage.textContent = data.message;
+                            formMessage.className = 'mt-4 text-center text-green-600 font-medium';
+                            formMessage.classList.remove('hidden');
+                            
+                            // Reset form
+                            contactForm.reset();
+                        } else {
+                            // Show error message
+                            formMessage.textContent = data.error || 'Failed to send message. Please try again.';
+                            formMessage.className = 'mt-4 text-center text-red-600 font-medium';
+                            formMessage.classList.remove('hidden');
+                        }
+                    } catch (error) {
+                        console.error('Contact form error:', error);
+                        formMessage.textContent = 'Network error. Please try again.';
+                        formMessage.className = 'mt-4 text-center text-red-600 font-medium';
+                        formMessage.classList.remove('hidden');
+                    } finally {
+                        // Reset button state
+                        submitText.textContent = 'Send Message';
+                        loadingSpinner.classList.add('hidden');
+                        contactForm.querySelector('button').disabled = false;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
