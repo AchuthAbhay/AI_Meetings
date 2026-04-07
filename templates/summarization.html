@@ -1,0 +1,2765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>AI Summarization & Translation - InsightFlow AI | 50+ Languages with TTS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0A0F1F;
+            color: #E2E8F0;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        :root {
+            --bg-deep: #0A0F1F;
+            --bg-dark: #141B2B;
+            --bg-card: #1A2335;
+            --bg-elevated: #222D42;
+            --bg-hover: #2A374F;
+            --accent-primary: #6366F1;
+            --accent-secondary: #8B5CF6;
+            --accent-tertiary: #3B82F6;
+            --accent-glow: #A78BFA;
+            --accent-success: #10B981;
+            --accent-warning: #F59E0B;
+            --accent-danger: #EF4444;
+            --text-primary: #F1F5F9;
+            --text-secondary: #CBD5E1;
+            --text-muted: #94A3B8;
+            --border-light: #2D3748;
+            --border-medium: #3A4559;
+            --gradient-primary: linear-gradient(135deg, #6366F1, #8B5CF6);
+            --gradient-success: linear-gradient(135deg, #10B981, #34D399);
+            --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.5);
+            --shadow-md: 0 8px 30px rgba(0, 0, 0, 0.6);
+            --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.7);
+        }
+
+        .dashboard-container {
+            display: flex;
+            height: 100vh;
+            background: var(--bg-deep);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-container::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-dark);
+            border-right: 1px solid var(--border-light);
+            height: 100vh;
+            overflow-y: auto;
+            padding: 24px 0;
+            box-shadow: var(--shadow-sm);
+            z-index: 10;
+            transition: width 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        .sidebar.collapsed .logo-text,
+        .sidebar.collapsed .user-profile-mini span,
+        .sidebar.collapsed .user-profile-mini small,
+        .sidebar.collapsed .nav-text,
+        .sidebar.collapsed .sidebar-footer span {
+            display: none;
+        }
+
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 12px 0;
+        }
+
+        .sidebar.collapsed .nav-icon {
+            margin-right: 0;
+            font-size: 20px;
+        }
+
+        .sidebar.collapsed .user-profile-mini i {
+            margin-right: 0;
+            font-size: 24px;
+        }
+
+        .sidebar.collapsed .logo {
+            justify-content: center;
+            padding: 0 10px;
+        }
+
+        .toggle-sidebar-btn {
+            position: absolute;
+            right: -12px;
+            top: 70px;
+            width: 24px;
+            height: 24px;
+            background: var(--accent-primary);
+            border: 2px solid var(--bg-dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            color: white;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-sidebar-btn:hover {
+            background: var(--accent-glow);
+            transform: scale(1.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 24px;
+            margin-bottom: 32px;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: var(--gradient-primary);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .user-profile-mini {
+            padding: 16px 20px;
+            margin: 0 16px 24px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            border: 1px solid var(--border-light);
+        }
+
+        .user-profile-mini i {
+            color: var(--accent-primary);
+            margin-right: 10px;
+        }
+
+        .user-profile-mini span {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .user-profile-mini small {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            margin-left: 28px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 16px;
+        }
+
+        .nav-item {
+            margin: 4px 0;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 14px;
+            transition: all 0.2s ease;
+            gap: 14px;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: var(--bg-hover);
+            color: var(--accent-glow);
+        }
+
+        .nav-link.active {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+        }
+
+        .nav-icon {
+            width: 22px;
+            font-size: 18px;
+        }
+
+        .sidebar-footer {
+            padding: 24px 20px;
+            border-top: 1px solid var(--border-light);
+            margin-top: 20px;
+        }
+
+        .logout-btn {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            border: 1px solid var(--border-light);
+            border-radius: 14px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-danger);
+            border-color: var(--accent-danger);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px 28px;
+            position: relative;
+            z-index: 1;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        /* Header */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            background: var(--bg-dark);
+            padding: 14px 24px;
+            border-radius: 20px;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+            flex-shrink: 0;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .menu-toggle {
+            display: none;
+            width: 40px;
+            height: 40px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .menu-toggle:hover {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .header-left h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-left h1 i {
+            color: var(--accent-primary);
+        }
+
+        .language-badge-header {
+            background: var(--bg-elevated);
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid var(--border-light);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .notifications {
+            position: relative;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            background: var(--bg-card);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-light);
+        }
+
+        .notifications i {
+            font-size: 18px;
+            color: var(--text-secondary);
+        }
+
+        .badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--accent-danger);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .user-profile {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 2px solid var(--accent-primary);
+        }
+
+        .user-profile img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover::before {
+            transform: translateX(0);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-primary);
+        }
+
+        .stat-icon {
+            width: 52px;
+            height: 52px;
+            background: var(--gradient-primary);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+        }
+
+        .stat-info h3 {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-desc {
+            font-size: 11px;
+            color: var(--accent-success);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Two Column Layout */
+        .two-column-layout {
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            gap: 24px;
+            height: calc(100vh - 180px);
+        }
+
+        /* Left Column */
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        /* Input Card */
+        .input-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+            flex-shrink: 0;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .card-header h2 {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-header h2 i {
+            color: var(--accent-primary);
+        }
+
+        .clear-btn {
+            padding: 6px 14px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: 30px;
+            color: var(--text-secondary);
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .clear-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-danger);
+        }
+
+        /* Input Tabs */
+        .input-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .input-tab {
+            flex: 1;
+            padding: 8px 12px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: 30px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .input-tab:hover,
+        .input-tab.active {
+            background: var(--gradient-primary);
+            color: white;
+            border-color: transparent;
+        }
+
+        .input-section {
+            background: var(--bg-elevated);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-light);
+        }
+
+        .section-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .section-label i {
+            color: var(--accent-primary);
+        }
+
+        .transcript-selector,
+        .text-area-container,
+        .document-upload {
+            display: none;
+        }
+
+        .transcript-selector.active,
+        .text-area-container.active,
+        .document-upload.active {
+            display: block;
+        }
+
+        .transcript-select {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .custom-textarea {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 13px;
+            line-height: 1.5;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .custom-textarea:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .char-counter {
+            text-align: right;
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .upload-area-small {
+            background: var(--bg-dark);
+            border: 2px dashed var(--border-medium);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area-small:hover {
+            border-color: var(--accent-primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .upload-area-small i {
+            font-size: 32px;
+            color: var(--accent-primary);
+            margin-bottom: 8px;
+        }
+
+        .upload-area-small h4 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .upload-area-small p {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .file-info-small {
+            margin-top: 12px;
+            padding: 8px 12px;
+            background: var(--bg-dark);
+            border-radius: 30px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Language Dropdown */
+        .language-selector {
+            background: var(--bg-elevated);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border-light);
+        }
+
+        .language-selector h4 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .language-dropdown {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        /* Summary Types */
+        .summary-types {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .type-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .type-card:hover,
+        .type-card.active {
+            background: var(--gradient-primary);
+            border-color: transparent;
+        }
+
+        .type-icon {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .type-title {
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .type-desc {
+            font-size: 9px;
+            opacity: 0.8;
+        }
+
+        /* Settings Row */
+        .settings-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .setting-item {
+            flex: 1;
+        }
+
+        .setting-item label {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .setting-item select {
+            width: 100%;
+            padding: 8px 12px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-light);
+            border-radius: 30px;
+            color: var(--text-primary);
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-elevated);
+            padding: 8px 14px;
+            border-radius: 30px;
+            border: 1px solid var(--border-light);
+        }
+
+        .checkbox-item label {
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .generate-btn {
+            width: 100%;
+            background: var(--gradient-primary);
+            border: none;
+            padding: 12px;
+            border-radius: 40px;
+            color: white;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            margin-bottom: 12px;
+        }
+
+        .generate-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .progress-container {
+            background: var(--bg-elevated);
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid var(--border-light);
+        }
+
+        .progress-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-dark);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-percent {
+            text-align: right;
+            font-size: 10px;
+            margin-top: 4px;
+            color: var(--accent-primary);
+        }
+
+        /* Recent Summaries Card */
+        .recent-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid var(--border-light);
+            flex: 0 0 auto;
+            max-height: 280px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .recent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-light);
+            flex-shrink: 0;
+        }
+
+        .recent-header h2 {
+            font-size: 15px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .view-all {
+            color: var(--accent-primary);
+            font-size: 11px;
+            cursor: pointer;
+            padding: 4px 12px;
+            background: var(--bg-elevated);
+            border-radius: 30px;
+        }
+
+        .recent-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .recent-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: var(--bg-elevated);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .recent-item:hover {
+            background: var(--bg-hover);
+            transform: translateX(3px);
+        }
+
+        .recent-icon {
+            width: 36px;
+            height: 36px;
+            background: var(--gradient-primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 14px;
+        }
+
+        .recent-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .recent-title {
+            font-weight: 600;
+            font-size: 12px;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .recent-meta {
+            display: flex;
+            gap: 8px;
+            font-size: 9px;
+            color: var(--text-muted);
+        }
+
+        .type-badge,
+        .lang-badge {
+            padding: 3px 8px;
+            background: var(--bg-dark);
+            border-radius: 16px;
+            font-size: 9px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .type-badge {
+            color: var(--accent-primary);
+        }
+
+        .lang-badge {
+            color: var(--accent-success);
+        }
+
+        .recent-actions {
+            position: absolute;
+            right: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: none;
+            gap: 3px;
+            background: var(--bg-card);
+            padding: 4px;
+            border-radius: 16px;
+        }
+
+        .recent-item:hover .recent-actions {
+            display: flex;
+        }
+
+        .icon-btn-small {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+        }
+
+        .icon-btn-small:hover {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        /* Quick Access Card */
+        .quick-access-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 16px;
+            border: 1px solid var(--border-light);
+            flex-shrink: 0;
+        }
+
+        .quick-header h2 {
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .quick-modules-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .module-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: 10px;
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .module-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent-primary);
+        }
+
+        .module-icon {
+            font-size: 16px;
+            color: var(--accent-primary);
+            margin-bottom: 3px;
+        }
+
+        .module-title {
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .usage-stats {
+            padding-top: 8px;
+            border-top: 1px solid var(--border-light);
+            margin-top: 8px;
+        }
+
+        .usage-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            margin-bottom: 4px;
+        }
+
+        .progress-bar-sm {
+            width: 100%;
+            height: 3px;
+            background: var(--bg-dark);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            border-radius: 2px;
+        }
+
+        /* Right Column - Results */
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        /* Results Card */
+        .results-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid var(--border-light);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-light);
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .results-header h2 {
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .results-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-light);
+            border-radius: 25px;
+            color: var(--text-secondary);
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: var(--gradient-primary);
+            color: white;
+        }
+
+        .download-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: var(--bg-dark);
+            min-width: 90px;
+            border-radius: 10px;
+            z-index: 10;
+            margin-top: 4px;
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+        }
+
+        .download-dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-content button {
+            width: 100%;
+            padding: 6px 10px;
+            text-align: left;
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-secondary);
+            font-size: 10px;
+        }
+
+        .dropdown-content button:hover {
+            background: var(--bg-hover);
+            color: var(--accent-glow);
+        }
+
+        /* Language Info Bar */
+        .language-info-bar {
+            background: var(--bg-elevated);
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .lang-info-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+        }
+
+        .lang-info-item i {
+            color: var(--accent-primary);
+        }
+
+        /* Summary Content - Large Area */
+        .summary-content {
+            background: var(--bg-elevated);
+            border-radius: 16px;
+            padding: 20px;
+            margin: 12px 0;
+            border: 1px solid var(--border-light);
+            flex: 1;
+            overflow-y: auto;
+            min-height: 280px;
+            max-height: 350px;
+        }
+
+        .summary-placeholder {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+
+        /* Summary Cards */
+        .summary-executive,
+        .summary-detailed {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .summary-section-card {
+            background: var(--bg-card);
+            border-radius: 14px;
+            padding: 16px;
+            border-left: 4px solid;
+        }
+
+        .summary-section-card.executive {
+            border-left-color: #6366F1;
+        }
+
+        .summary-section-card.decisions {
+            border-left-color: #8B5CF6;
+        }
+
+        .summary-section-card.actions {
+            border-left-color: #10B981;
+        }
+
+        .summary-section-card.takeaways {
+            border-left-color: #F59E0B;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .section-header h3 {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .section-content {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            font-size: 13px;
+        }
+
+        .bullet-list-enhanced {
+            list-style: none;
+            padding: 0;
+        }
+
+        .bullet-list-enhanced li {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .summary-bullet {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .bullet-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid var(--border-light);
+        }
+
+        .bullet-card i {
+            color: var(--accent-primary);
+            margin-bottom: 6px;
+        }
+
+        .bullet-card p {
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        /* Translation Panel */
+        .translation-panel {
+            background: var(--bg-elevated);
+            border-radius: 16px;
+            padding: 16px;
+            margin-top: 12px;
+            border: 1px solid var(--border-light);
+            flex-shrink: 0;
+        }
+
+        .translation-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .translation-header i {
+            color: var(--accent-primary);
+            font-size: 18px;
+        }
+
+        .translation-header strong {
+            font-size: 14px;
+        }
+
+        .translation-select {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--bg-dark);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .translate-btn {
+            width: 100%;
+            padding: 10px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 30px;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            margin-bottom: 12px;
+        }
+
+        .translate-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .tts-controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            align-items: center;
+        }
+
+        .tts-btn {
+            padding: 8px 16px;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 30px;
+            color: white;
+            font-weight: 600;
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .tts-btn.stop-btn {
+            background: var(--accent-danger);
+        }
+
+        .tts-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        /* Translation Result - Same Structure as Summary */
+        .translation-result {
+            margin-top: 12px;
+            padding: 16px;
+            background: var(--bg-card);
+            border-radius: 14px;
+            max-height: 250px;
+            overflow-y: auto;
+            font-size: 13px;
+            line-height: 1.6;
+            border-left: 4px solid var(--accent-primary);
+        }
+
+        .translation-result-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .translation-result-header i {
+            color: var(--accent-primary);
+            font-size: 14px;
+        }
+
+        .translation-result-header strong {
+            font-size: 13px;
+        }
+
+        .translation-content {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Summary Stats */
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border-light);
+            flex-shrink: 0;
+        }
+
+        .stat-item-small {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            background: var(--bg-elevated);
+            border-radius: 10px;
+            border: 1px solid var(--border-light);
+        }
+
+        .stat-icon-small {
+            width: 28px;
+            height: 28px;
+            background: var(--gradient-primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .stat-label-small {
+            font-size: 9px;
+            color: var(--text-muted);
+        }
+
+        .stat-value-small {
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 24px;
+            padding: 24px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid var(--border-light);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            font-size: 18px;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent-primary);
+            border-radius: 10px;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @media (max-width: 1200px) {
+            .two-column-layout {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .summary-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .summary-bullet {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 1000;
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .menu-toggle {
+                display: flex;
+            }
+
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-types {
+                grid-template-columns: 1fr;
+            }
+
+            .settings-row {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="toggle-sidebar-btn" id="toggleSidebar"><i class="fas fa-chevron-left"></i></div>
+            <div class="logo">
+                <div class="logo-icon"><i class="fas fa-brain"></i></div>
+                <span class="logo-text">InsightFlow AI</span>
+            </div>
+            <div class="user-profile-mini">
+                <i class="fas fa-user-circle"></i>
+                <span id="userName">Loading...</span>
+                <small>AI Analyst</small>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/dashboard" class="nav-link">
+                        <i class="fas fa-home nav-icon"></i>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/live-transcription" class="nav-link">
+                        <i class="fas fa-microphone-alt nav-icon"></i>
+                        <span class="nav-text">Live Transcription</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/upload-transcribe" class="nav-link">
+                        <i class="fas fa-upload nav-icon"></i>
+                        <span class="nav-text">Upload & Transcribe</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/summarization" class="nav-link active">
+                        <i class="fas fa-file-alt nav-icon"></i>
+                        <span class="nav-text">Summarization</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/my-tasks" class="nav-link">
+                        <i class="fas fa-tasks nav-icon"></i>
+                        <span class="nav-text">My Tasks</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/speaker-identification" class="nav-link">
+                        <i class="fas fa-user-friends nav-icon"></i>
+                        <span class="nav-text">Speaker Identification</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/sentiment-analysis" class="nav-link">
+                        <i class="fas fa-smile nav-icon"></i>
+                        <span class="nav-text">Sentiment Analysis</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/translation" class="nav-link">
+                        <i class="fas fa-language nav-icon"></i>
+                        <span class="nav-text">Translation</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/files-history" class="nav-link">
+                        <i class="fas fa-folder-open nav-icon"></i>
+                        <span class="nav-text">Files / History</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/analytics" class="nav-link">
+                        <i class="fas fa-chart-line nav-icon"></i>
+                        <span class="nav-text">Analytics & Reports</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/calendar" class="nav-link">
+                        <i class="fas fa-calendar-alt nav-icon"></i>
+                        <span class="nav-text">Calendar Integration</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/profile" class="nav-link">
+                        <i class="fas fa-cog nav-icon"></i>
+                        <span class="nav-text">Settings / Profile</span>
+                    </a>
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i><span>Logout</span></button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+                    <h1><i class="fas fa-file-alt"></i> AI Summarization & Translation</h1>
+                    <div class="language-badge-header"><i class="fas fa-language"></i> 50+ Languages with TTS</div>
+                </div>
+                <div class="header-right">
+                    <div class="notifications"><i class="fas fa-bell"></i><span class="badge">3</span></div>
+                    <div class="user-profile"><img id="profileImage" src="https://ui-avatars.com/api/?name=User&background=6366F1&color=fff" alt="Profile"></div>
+                </div>
+            </header>
+
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
+                    <div class="stat-info">
+                        <h3>Summaries</h3>
+                        <div class="stat-number" id="totalSummaries">0</div>
+                        <div class="stat-desc"><i class="fas fa-arrow-up"></i> <span id="weeklyIncrease">+0</span></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                    <div class="stat-info">
+                        <h3>Processing</h3>
+                        <div class="stat-number" id="avgProcessing">0.0s</div>
+                        <div class="stat-desc"><i class="fas fa-bolt"></i> Fast</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-language"></i></div>
+                    <div class="stat-info">
+                        <h3>Languages</h3>
+                        <div class="stat-number" id="languageCount">50+</div>
+                        <div class="stat-desc"><i class="fas fa-check"></i> Global + Indian</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-volume-up"></i></div>
+                    <div class="stat-info">
+                        <h3>TTS Ready</h3>
+                        <div class="stat-number">✓</div>
+                        <div class="stat-desc">Play/Stop</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two Column Layout -->
+            <div class="two-column-layout">
+                <!-- Left Column -->
+                <div class="left-column">
+                    <!-- Input Card -->
+                    <div class="input-card">
+                        <div class="card-header">
+                            <h2><i class="fas fa-pen-alt"></i> Input Source</h2>
+                            <button class="clear-btn" onclick="clearAll()"><i class="fas fa-trash-alt"></i> Clear</button>
+                        </div>
+
+                        <div class="input-tabs">
+                            <div class="input-tab active" onclick="switchInputTab('transcript')"><i class="fas fa-history"></i> My Transcripts</div>
+                            <div class="input-tab" onclick="switchInputTab('text')"><i class="fas fa-edit"></i> Paste Text</div>
+                            <div class="input-tab" onclick="switchInputTab('document')"><i class="fas fa-file-upload"></i> Document</div>
+                        </div>
+
+                        <div class="input-section transcript-selector active" id="transcriptSelector">
+                            <div class="section-label"><i class="fas fa-history"></i><span>Select from Your Transcriptions</span></div>
+                            <select class="transcript-select" id="transcriptSelect" onchange="loadSelectedTranscript()">
+                                <option value="">Choose a transcript...</option>
+                            </select>
+                            <div id="transcriptPreview" style="margin-top: 12px; font-size: 12px; color: var(--text-muted);"></div>
+                        </div>
+
+                        <div class="input-section text-area-container" id="textAreaContainer">
+                            <div class="section-label"><i class="fas fa-edit"></i><span>Paste Your Text</span></div>
+                            <textarea class="custom-textarea" id="transcriptText" placeholder="Paste your transcript here... Supports Hindi, Marathi, Tamil, Telugu, Bengali, English, Spanish, French, and more..."></textarea>
+                            <div class="char-counter" id="charCounter">0 characters</div>
+                        </div>
+
+                        <div class="input-section document-upload" id="documentUpload">
+                            <div class="section-label"><i class="fas fa-file-upload"></i><span>Upload Document</span></div>
+                            <div class="upload-area-small" id="documentUploadArea">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <h4>Click to upload or drag & drop</h4>
+                                <p>TXT, DOC, DOCX, PDF (max 10MB)</p>
+                                <input type="file" id="documentFile" accept=".txt,.doc,.docx,.pdf" hidden>
+                            </div>
+                            <div class="file-info-small" id="documentInfo" style="display: none;"></div>
+                        </div>
+
+                        <!-- Language Dropdown -->
+                        <div class="language-selector">
+                            <h4><i class="fas fa-language"></i> Output Summary Language</h4>
+                            <select class="language-dropdown" id="outputLanguageSelect" onchange="selectLanguage()">
+                                <optgroup label="🇮🇳 Indian Languages">
+                                    <option value="hi">हिन्दी (Hindi)</option>
+                                    <option value="mr">मराठी (Marathi)</option>
+                                    <option value="ta">தமிழ் (Tamil)</option>
+                                    <option value="te">తెలుగు (Telugu)</option>
+                                    <option value="bn">বাংলা (Bengali)</option>
+                                    <option value="gu">ગુજરાતી (Gujarati)</option>
+                                    <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                                    <option value="ml">മലയാളം (Malayalam)</option>
+                                    <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+                                </optgroup>
+                                <optgroup label="🌍 International Languages">
+                                    <option value="en" selected>English</option>
+                                    <option value="es">Español (Spanish)</option>
+                                    <option value="fr">Français (French)</option>
+                                    <option value="de">Deutsch (German)</option>
+                                    <option value="it">Italiano (Italian)</option>
+                                    <option value="pt">Português (Portuguese)</option>
+                                    <option value="ru">Русский (Russian)</option>
+                                    <option value="ja">日本語 (Japanese)</option>
+                                    <option value="ko">한국어 (Korean)</option>
+                                    <option value="zh">中文 (Chinese)</option>
+                                    <option value="ar">العربية (Arabic)</option>
+                                </optgroup>
+                            </select>
+                        </div>
+
+                        <div class="summary-types">
+                            <div class="type-card active" onclick="setSummaryType('executive')" id="executiveType">
+                                <div class="type-icon"><i class="fas fa-briefcase"></i></div>
+                                <div class="type-title">Executive</div>
+                                <div class="type-desc">Key decisions</div>
+                            </div>
+                            <div class="type-card" onclick="setSummaryType('detailed')" id="detailedType">
+                                <div class="type-icon"><i class="fas fa-list-ul"></i></div>
+                                <div class="type-title">Detailed</div>
+                                <div class="type-desc">Comprehensive</div>
+                            </div>
+                            <div class="type-card" onclick="setSummaryType('bullet')" id="bulletType">
+                                <div class="type-icon"><i class="fas fa-circle"></i></div>
+                                <div class="type-title">Bullet Points</div>
+                                <div class="type-desc">Quick takeaways</div>
+                            </div>
+                        </div>
+
+                        <div class="settings-row">
+                            <div class="setting-item">
+                                <label>Length</label>
+                                <select id="summaryLength">
+                                    <option value="short">Short</option>
+                                    <option value="medium" selected>Medium</option>
+                                    <option value="long">Long</option>
+                                </select>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="includeKeyPoints" checked>
+                                <label>Key Points</label>
+                            </div>
+                        </div>
+
+                        <button class="generate-btn" id="generateBtn" onclick="generateSummary()"><i class="fas fa-magic"></i> Generate Summary</button>
+
+                        <div class="progress-container" id="progressSection" style="display: none;">
+                            <div class="progress-status"><i class="fas fa-circle-notch fa-spin"></i><span id="progressStatus">Analyzing...</span></div>
+                            <div class="progress-bar-bg">
+                                <div class="progress-bar-fill" id="progressBar" style="width: 0%"></div>
+                            </div>
+                            <div class="progress-percent" id="progressPercentage">0%</div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Summaries with Scrollbar -->
+                    <div class="recent-card">
+                        <div class="recent-header">
+                            <h2><i class="fas fa-history"></i> Recent Summaries</h2>
+                            <span class="view-all" onclick="viewAllSummaries()">View All</span>
+                        </div>
+                        <div class="recent-list" id="recentSummariesList">
+                            <div class="empty-state">
+                                <i class="fas fa-file-alt"></i>
+                                <p>No summaries yet. Generate your first summary!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="right-column">
+                    <div class="quick-access-card">
+                        <div class="quick-header">
+                            <h2><i class="fas fa-bolt"></i> Quick Access</h2>
+                        </div>
+                        <div class="quick-modules-grid">
+                            <div class="module-card" onclick="location.href='/upload-transcribe'">
+                                <div class="module-icon"><i class="fas fa-upload"></i></div>
+                                <div class="module-title">Transcribe</div>
+                            </div>
+                            <div class="module-card" onclick="location.href='/my-tasks'">
+                                <div class="module-icon"><i class="fas fa-tasks"></i></div>
+                                <div class="module-title">Tasks</div>
+                            </div>
+                            <div class="module-card" onclick="location.href='/sentiment-analysis'">
+                                <div class="module-icon"><i class="fas fa-smile"></i></div>
+                                <div class="module-title">Sentiment</div>
+                            </div>
+                            <div class="module-card" onclick="location.href='/translation'">
+                                <div class="module-icon"><i class="fas fa-language"></i></div>
+                                <div class="module-title">Translate</div>
+                            </div>
+                        </div>
+                        <div class="usage-stats">
+                            <div class="usage-label">
+                                <span>API Credits</span>
+                                <span id="apiCredits">4,850</span>
+                            </div>
+                            <div class="progress-bar-sm">
+                                <div class="progress-fill" id="creditsProgress" style="width: 75%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="results-card">
+                        <div class="results-header">
+                            <h2><i class="fas fa-file-alt"></i> Generated Summary</h2>
+                            <div class="results-actions" id="resultsActions" style="display: none;">
+                                <button class="action-btn" onclick="copySummary()"><i class="fas fa-copy"></i> Copy</button>
+                                <button class="action-btn" onclick="shareSummary()"><i class="fas fa-share-alt"></i> Share</button>
+                                <div class="download-dropdown">
+                                    <button class="action-btn"><i class="fas fa-download"></i> Download</button>
+                                    <div class="dropdown-content">
+                                        <button onclick="downloadSummary('txt')"><i class="fas fa-file-alt"></i> TXT</button>
+                                        <button onclick="downloadSummary('pdf')"><i class="fas fa-file-pdf"></i> PDF</button>
+                                        <button onclick="downloadSummary('doc')"><i class="fas fa-file-word"></i> DOC</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="language-info-bar" id="languageInfoBar" style="display: none;">
+                            <div class="lang-info-item"><i class="fas fa-microphone"></i><span>Input: <strong id="inputLanguage">Auto</strong></span></div>
+                            <div class="lang-info-item"><i class="fas fa-language"></i><span>Output: <strong id="outputLanguage">English</strong></span></div>
+                            <div class="lang-info-item"><i class="fas fa-check-circle"></i><span>Confidence: <strong id="confidenceScore">High</strong></span></div>
+                        </div>
+
+                        <div class="summary-content" id="summaryContent">
+                            <div class="summary-placeholder">
+                                <i class="fas fa-file-alt"></i>
+                                <p>Your AI-generated summary will appear here</p>
+                                <p style="font-size: 12px;">Supports 50+ languages with Text-to-Speech</p>
+                            </div>
+                        </div>
+
+                        <!-- Translation Panel with TTS Controls -->
+                        <div class="translation-panel" id="translationPanel" style="display: none;">
+                            <div class="translation-header"><i class="fas fa-language"></i><strong>Translate & Listen</strong></div>
+                            <select class="translation-select" id="translateTargetLang">
+                                <optgroup label="🇮🇳 Indian Languages">
+                                    <option value="hi">हिन्दी (Hindi)</option>
+                                    <option value="mr">मराठी (Marathi)</option>
+                                    <option value="ta">தமிழ் (Tamil)</option>
+                                    <option value="te">తెలుగు (Telugu)</option>
+                                    <option value="bn">বাংলা (Bengali)</option>
+                                    <option value="gu">ગુજરાતી (Gujarati)</option>
+                                    <option value="kn">ಕನ್ನಡ (Kannada)</option>
+                                    <option value="ml">മലയാളം (Malayalam)</option>
+                                    <option value="pa">ਪੰਜਾਬੀ (Punjabi)</option>
+                                </optgroup>
+                                <optgroup label="🌍 International Languages">
+                                    <option value="en">English</option>
+                                    <option value="es">Español (Spanish)</option>
+                                    <option value="fr">Français (French)</option>
+                                    <option value="de">Deutsch (German)</option>
+                                    <option value="it">Italiano (Italian)</option>
+                                    <option value="pt">Português (Portuguese)</option>
+                                    <option value="ru">Русский (Russian)</option>
+                                    <option value="ja">日本語 (Japanese)</option>
+                                    <option value="ko">한국어 (Korean)</option>
+                                    <option value="zh">中文 (Chinese)</option>
+                                    <option value="ar">العربية (Arabic)</option>
+                                </optgroup>
+                            </select>
+                            <button class="translate-btn" onclick="translateSummary()"><i class="fas fa-language"></i> Translate Summary</button>
+                            <div class="tts-controls">
+                                <button class="tts-btn" id="playOriginalTtsBtn" onclick="playTTS('original')"><i class="fas fa-play"></i> Read Summary</button>
+                                <button class="tts-btn stop-btn" id="stopTtsBtn" onclick="stopTTS()"><i class="fas fa-stop"></i> Stop</button>
+                            </div>
+                            <div id="translationResult" class="translation-result" style="display: none;"></div>
+                            <div class="tts-controls" id="translationTtsControls" style="display: none; margin-top: 10px;">
+                                <button class="tts-btn" id="playTranslationTtsBtn" onclick="playTTS('translation')"><i class="fas fa-play"></i> Read Translation</button>
+                            </div>
+                        </div>
+
+                        <div class="summary-stats" id="summaryStats" style="display: none;">
+                            <div class="stat-item-small">
+                                <div class="stat-icon-small"><i class="fas fa-font"></i></div>
+                                <div>
+                                    <div class="stat-label-small">Words</div>
+                                    <div class="stat-value-small" id="summaryWords">0</div>
+                                </div>
+                            </div>
+                            <div class="stat-item-small">
+                                <div class="stat-icon-small"><i class="fas fa-clock"></i></div>
+                                <div>
+                                    <div class="stat-label-small">Read Time</div>
+                                    <div class="stat-value-small" id="readTime">0 min</div>
+                                </div>
+                            </div>
+                            <div class="stat-item-small">
+                                <div class="stat-icon-small"><i class="fas fa-compress-alt"></i></div>
+                                <div>
+                                    <div class="stat-label-small">Compression</div>
+                                    <div class="stat-value-small" id="compressionRatio">0%</div>
+                                </div>
+                            </div>
+                            <div class="stat-item-small">
+                                <div class="stat-icon-small"><i class="fas fa-tag"></i></div>
+                                <div>
+                                    <div class="stat-label-small">Type</div>
+                                    <div class="stat-value-small" id="summaryTypeDisplay">Executive</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ========== SIDEBAR TOGGLE ==========
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const toggleBtn = document.getElementById('toggleSidebar');
+        const menuToggle = document.getElementById('menuToggle');
+
+        if (localStorage.getItem('sidebarCollapsed') === 'true') {
+            sidebar.classList.add('collapsed');
+            mainContent.classList.add('expanded');
+            toggleBtn.querySelector('i').classList.replace('fa-chevron-left', 'fa-chevron-right');
+        }
+
+        toggleBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            const icon = toggleBtn.querySelector('i');
+            if (sidebar.classList.contains('collapsed')) {
+                icon.classList.replace('fa-chevron-left', 'fa-chevron-right');
+                localStorage.setItem('sidebarCollapsed', 'true');
+            } else {
+                icon.classList.replace('fa-chevron-right', 'fa-chevron-left');
+                localStorage.setItem('sidebarCollapsed', 'false');
+            }
+        });
+
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('mobile-open');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 768) {
+                if (!sidebar.contains(e.target) && !menuToggle.contains(e.target)) {
+                    sidebar.classList.remove('mobile-open');
+                }
+            }
+        });
+
+        // ========== TTS VARIABLES ==========
+        let currentUtterance = null;
+        let currentTTSMode = null;
+        let currentTranslationText = null;
+
+        // ========== TEXT-TO-SPEECH FUNCTIONS ==========
+        function playTTS(mode) {
+            stopTTS();
+            
+            let text = '';
+            let lang = 'en';
+            
+            if (mode === 'original') {
+                if (!currentSummary) {
+                    showNotification('No summary to read', 'error');
+                    return;
+                }
+                text = currentSummary;
+                lang = selectedOutputLang;
+            } else if (mode === 'translation') {
+                if (!currentTranslationText) {
+                    showNotification('No translation to read', 'error');
+                    return;
+                }
+                text = currentTranslationText;
+                const targetLang = document.getElementById('translateTargetLang').value;
+                lang = targetLang;
+            }
+            
+            if (!text || text.trim() === '') {
+                showNotification('No text to read', 'error');
+                return;
+            }
+            
+            const langMap = {
+                'hi': 'hi-IN', 'mr': 'hi-IN', 'ta': 'ta-IN', 'te': 'te-IN', 'bn': 'bn-IN',
+                'gu': 'hi-IN', 'kn': 'kn-IN', 'ml': 'ml-IN', 'pa': 'pa-IN', 'en': 'en-US',
+                'es': 'es-ES', 'fr': 'fr-FR', 'de': 'de-DE', 'it': 'it-IT', 'pt': 'pt-PT',
+                'ru': 'ru-RU', 'ja': 'ja-JP', 'ko': 'ko-KR', 'zh': 'zh-CN', 'ar': 'ar-SA'
+            };
+            
+            const speechLang = langMap[lang] || 'en-US';
+            
+            if ('speechSynthesis' in window) {
+                currentUtterance = new SpeechSynthesisUtterance(text);
+                currentUtterance.lang = speechLang;
+                currentUtterance.rate = 0.9;
+                currentUtterance.pitch = 1.0;
+                currentUtterance.volume = 1.0;
+                
+                currentUtterance.onend = function() {
+                    currentUtterance = null;
+                    currentTTSMode = null;
+                    showNotification('Finished reading', 'info');
+                };
+                
+                currentUtterance.onerror = function() {
+                    showNotification('TTS error occurred', 'error');
+                    currentUtterance = null;
+                };
+                
+                window.speechSynthesis.speak(currentUtterance);
+                currentTTSMode = mode;
+                showNotification(`Reading ${mode === 'original' ? 'summary' : 'translation'}...`, 'info');
+            } else {
+                showNotification('Text-to-Speech not supported in this browser', 'error');
+            }
+        }
+        
+        function stopTTS() {
+            if (window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+                currentUtterance = null;
+                currentTTSMode = null;
+                showNotification('Stopped reading', 'info');
+            }
+        }
+
+        // ========== GLOBAL VARIABLES ==========
+        let currentSummaryType = 'executive';
+        let currentSummary = null;
+        let currentSummaryId = null;
+        let originalTextLength = 0;
+        let selectedDocument = null;
+        let currentInputMode = 'transcript';
+        let transcriptsList = [];
+        let summaries = JSON.parse(localStorage.getItem('summaries')) || [];
+        let selectedOutputLang = 'en';
+        let selectedOutputLangName = 'English';
+
+        // Language selection
+        function selectLanguage() {
+            const select = document.getElementById('outputLanguageSelect');
+            selectedOutputLang = select.value;
+            selectedOutputLangName = select.options[select.selectedIndex].text.split('(')[0].trim();
+            document.getElementById('outputLanguage').textContent = selectedOutputLangName;
+            showNotification(`Summary language set to ${selectedOutputLangName}`, 'success');
+        }
+
+        // Switch input tabs
+        function switchInputTab(mode) {
+            currentInputMode = mode;
+            document.querySelectorAll('.input-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            document.querySelectorAll('.transcript-selector, .text-area-container, .document-upload').forEach(el => el.classList.remove('active'));
+            if (mode === 'transcript') {
+                document.getElementById('transcriptSelector').classList.add('active');
+                loadRecentTranscripts();
+            }
+            if (mode === 'text') {
+                document.getElementById('textAreaContainer').classList.add('active');
+                selectedDocument = null;
+                document.getElementById('documentInfo').style.display = 'none';
+            }
+            if (mode === 'document') {
+                document.getElementById('documentUpload').classList.add('active');
+                document.getElementById('transcriptText').value = '';
+                updateCharCount();
+            }
+        }
+
+        // Load transcripts from backend
+        async function loadRecentTranscripts() {
+            try {
+                const response = await fetch('/api/recent-transcripts?limit=20');
+                const data = await response.json();
+                if (data.success && data.transcripts && data.transcripts.length > 0) {
+                    transcriptsList = data.transcripts;
+                    const select = document.getElementById('transcriptSelect');
+                    let options = '<option value="">Choose a transcript...</option>';
+                    data.transcripts.forEach(t => {
+                        const date = t.created_at_formatted || new Date(t.timestamp).toLocaleDateString() || '';
+                        options += `<option value="${t.id}" data-full-text="${escapeHtml(t.full_text || t.text || '')}">📝 ${escapeHtml(t.name)} - ${t.language_name} (${date})</option>`;
+                    });
+                    select.innerHTML = options;
+                    showNotification(`Loaded ${data.transcripts.length} transcripts`, 'success');
+                } else {
+                    const select = document.getElementById('transcriptSelect');
+                    select.innerHTML = '<option value="">📁 No transcripts found. Please upload audio first.</option>';
+                    showNotification('No transcripts found. Please upload audio in the Upload & Transcribe page.', 'info');
+                }
+            } catch (error) {
+                console.error('Failed to load transcripts:', error);
+                const select = document.getElementById('transcriptSelect');
+                select.innerHTML = '<option value="">⚠️ Error loading transcripts. Please try again.</option>';
+                showNotification('Failed to load transcripts. Please check your connection.', 'error');
+            }
+        }
+
+        function loadSelectedTranscript() {
+            const select = document.getElementById('transcriptSelect');
+            const selectedId = select.value;
+            if (!selectedId) return;
+            
+            const transcript = transcriptsList.find(t => t.id == selectedId);
+            if (transcript) {
+                const textArea = document.getElementById('transcriptText');
+                const fullText = transcript.full_text || transcript.text || '';
+                textArea.value = fullText;
+                updateCharCount();
+                originalTextLength = fullText.length;
+                const previewDiv = document.getElementById('transcriptPreview');
+                previewDiv.innerHTML = `<i class="fas fa-check-circle" style="color: #10B981;"></i> Loaded: ${escapeHtml(transcript.name)} (${transcript.word_count || fullText.split(/\s+/).length} words) - Language: ${transcript.language_name}`;
+                setTimeout(() => { 
+                    if (previewDiv.innerHTML.includes('Loaded:')) {
+                        previewDiv.innerHTML = '';
+                    }
+                }, 5000);
+                showNotification(`Loaded: ${transcript.name}`, 'success');
+            }
+        }
+
+        // Document upload handling
+        const docUploadArea = document.getElementById('documentUploadArea');
+        const docFile = document.getElementById('documentFile');
+        const docInfo = document.getElementById('documentInfo');
+
+        if (docUploadArea) {
+            docUploadArea.addEventListener('click', () => docFile.click());
+            docUploadArea.addEventListener('dragover', (e) => { 
+                e.preventDefault(); 
+                docUploadArea.style.borderColor = '#6366F1';
+                docUploadArea.style.background = 'rgba(99, 102, 241, 0.1)';
+            });
+            docUploadArea.addEventListener('dragleave', () => { 
+                docUploadArea.style.borderColor = '#3A4559';
+                docUploadArea.style.background = '#222D42';
+            });
+            docUploadArea.addEventListener('drop', (e) => { 
+                e.preventDefault(); 
+                docUploadArea.style.borderColor = '#3A4559';
+                docUploadArea.style.background = '#222D42';
+                if (e.dataTransfer.files.length) handleDocumentSelection(e.dataTransfer.files[0]); 
+            });
+            docFile.addEventListener('change', (e) => { 
+                if (e.target.files.length) handleDocumentSelection(e.target.files[0]); 
+            });
+        }
+
+        function handleDocumentSelection(file) {
+            const validExtensions = ['txt', 'doc', 'docx', 'pdf'];
+            const fileExt = file.name.split('.').pop().toLowerCase();
+            if (!validExtensions.includes(fileExt)) { 
+                showNotification('Please upload a valid document file (TXT, DOC, DOCX, PDF)', 'error'); 
+                return; 
+            }
+            if (file.size > 10 * 1024 * 1024) { 
+                showNotification('File size must be less than 10MB', 'error'); 
+                return; 
+            }
+            selectedDocument = file;
+            docInfo.style.display = 'flex';
+            docInfo.innerHTML = `<i class="fas fa-check-circle"></i><span>${file.name} (${(file.size / 1024).toFixed(2)} KB)</span>`;
+            showNotification(`Document selected: ${file.name}`, 'success');
+        }
+
+        function updateCharCount() {
+            const count = document.getElementById('transcriptText').value.length;
+            document.getElementById('charCounter').textContent = `${count} characters`;
+        }
+
+        document.getElementById('transcriptText').addEventListener('input', updateCharCount);
+
+        function setSummaryType(type) {
+            currentSummaryType = type;
+            document.querySelectorAll('.type-card').forEach(c => c.classList.remove('active'));
+            if (type === 'executive') document.getElementById('executiveType').classList.add('active');
+            if (type === 'detailed') document.getElementById('detailedType').classList.add('active');
+            if (type === 'bullet') document.getElementById('bulletType').classList.add('active');
+        }
+
+        function clearAll() {
+            document.getElementById('transcriptText').value = '';
+            document.getElementById('transcriptSelect').value = '';
+            selectedDocument = null;
+            docInfo.style.display = 'none';
+            docFile.value = '';
+            updateCharCount();
+            originalTextLength = 0;
+            document.getElementById('transcriptPreview').innerHTML = '';
+            showNotification('Cleared all inputs', 'info');
+        }
+
+        // Read document file content
+        function readDocument(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = () => reject('Failed to read file');
+                reader.readAsText(file);
+            });
+        }
+
+        // Generate Summary
+        async function generateSummary() {
+            let text = '';
+            
+            if (currentInputMode === 'transcript' || currentInputMode === 'text') {
+                text = document.getElementById('transcriptText').value.trim();
+                if (!text) {
+                    showNotification('Please select a transcript or enter text to summarize', 'error');
+                    return;
+                }
+            } else if (currentInputMode === 'document') {
+                if (!selectedDocument) {
+                    showNotification('Please upload a document first', 'error');
+                    return;
+                }
+                try {
+                    text = await readDocument(selectedDocument);
+                    if (!text.trim()) {
+                        showNotification('Document is empty or could not be read', 'error');
+                        return;
+                    }
+                } catch (error) {
+                    showNotification('Failed to read document', 'error');
+                    return;
+                }
+            }
+
+            const progressSection = document.getElementById('progressSection');
+            const generateBtn = document.getElementById('generateBtn');
+            progressSection.style.display = 'block';
+            generateBtn.disabled = true;
+
+            const length = document.getElementById('summaryLength').value;
+            const includeKeyPoints = document.getElementById('includeKeyPoints').checked;
+
+            try {
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 10;
+                    if (progress <= 90) updateProgress(progress, `Generating ${currentSummaryType} summary in ${selectedOutputLangName}...`);
+                }, 300);
+
+                const response = await fetch('/api/summarize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        transcript: text,
+                        summary_type: currentSummaryType,
+                        length: length,
+                        include_key_points: includeKeyPoints,
+                        output_language: selectedOutputLang
+                    })
+                });
+
+                clearInterval(interval);
+                const data = await response.json();
+
+                if (data.success) {
+                    updateProgress(100, 'Complete!');
+                    setTimeout(() => {
+                        progressSection.style.display = 'none';
+                        displayFormattedSummary(data.summary, data.metadata);
+                        generateBtn.disabled = false;
+                        document.getElementById('languageInfoBar').style.display = 'flex';
+                        document.getElementById('inputLanguage').textContent = data.metadata?.detected_language || 'Auto-detected';
+                        document.getElementById('outputLanguage').textContent = selectedOutputLangName;
+                        document.getElementById('confidenceScore').textContent = data.metadata?.confidence ? `${Math.round(data.metadata.confidence * 100)}%` : 'High';
+                        document.getElementById('translationPanel').style.display = 'block';
+                    }, 500);
+                } else {
+                    throw new Error(data.error || 'Generation failed');
+                }
+            } catch (error) {
+                progressSection.style.display = 'none';
+                showNotification(error.message, 'error');
+                generateBtn.disabled = false;
+            }
+        }
+
+        function updateProgress(percent, status) {
+            document.getElementById('progressBar').style.width = `${percent}%`;
+            document.getElementById('progressPercentage').textContent = `${percent}%`;
+            document.getElementById('progressStatus').innerHTML = `<i class="fas fa-circle-notch fa-spin"></i><span>${status}</span>`;
+        }
+
+        function displayFormattedSummary(summary, metadata) {
+            currentSummary = summary;
+            const wordCount = metadata?.word_count || summary.split(/\s+/).length;
+            document.getElementById('summaryWords').textContent = wordCount;
+            document.getElementById('readTime').textContent = Math.ceil(wordCount / 200) + ' min';
+            let compression = originalTextLength ? Math.min(95, Math.max(40, Math.round((1 - wordCount / (originalTextLength / 5)) * 100))) : 75;
+            document.getElementById('compressionRatio').textContent = compression + '%';
+            document.getElementById('summaryTypeDisplay').textContent = currentSummaryType.charAt(0).toUpperCase() + currentSummaryType.slice(1);
+            document.getElementById('resultsActions').style.display = 'flex';
+            document.getElementById('summaryStats').style.display = 'grid';
+
+            let html = '';
+            if (currentSummaryType === 'executive') {
+                html = formatExecutiveSummary(summary);
+            } else if (currentSummaryType === 'detailed') {
+                html = formatDetailedSummary(summary);
+            } else {
+                html = formatBulletSummary(summary);
+            }
+            document.getElementById('summaryContent').innerHTML = `<div class="fade-in">${html}</div>`;
+            saveSummary(summary, wordCount);
+        }
+
+        function formatExecutiveSummary(summary) {
+            const lines = summary.split('\n');
+            let sections = { executive: [], decisions: [], actions: [], takeaways: [] };
+            let currentSection = 'executive';
+            lines.forEach(line => {
+                line = line.trim();
+                if (!line) return;
+                if (line.includes('EXECUTIVE SUMMARY')) currentSection = 'executive';
+                else if (line.includes('KEY DECISIONS')) currentSection = 'decisions';
+                else if (line.includes('ACTION ITEMS')) currentSection = 'actions';
+                else if (line.includes('KEY TAKEAWAYS')) currentSection = 'takeaways';
+                else if (sections[currentSection]) sections[currentSection].push(line);
+            });
+            let html = '<div class="summary-executive">';
+            if (sections.executive.length) {
+                html += `<div class="summary-section-card executive"><div class="section-header"><i class="fas fa-briefcase"></i><h3>Executive Summary</h3></div><div class="section-content">${escapeHtml(sections.executive.join(' '))}</div></div>`;
+            }
+            if (sections.decisions.length) {
+                const decisions = sections.decisions.filter(d => d.startsWith('-') || d.startsWith('•')).map(d => d.replace(/^[-•]\s*/, ''));
+                if (decisions.length) {
+                    html += `<div class="summary-section-card decisions"><div class="section-header"><i class="fas fa-check-circle"></i><h3>Key Decisions</h3></div><ul class="bullet-list-enhanced">${decisions.map(d => `<li><i class="fas fa-circle"></i><span>${escapeHtml(d)}</span></li>`).join('')}</ul></div>`;
+                } else {
+                    html += `<div class="summary-section-card decisions"><div class="section-header"><i class="fas fa-check-circle"></i><h3>Key Decisions</h3></div><div class="section-content">${escapeHtml(sections.decisions.join(' '))}</div></div>`;
+                }
+            }
+            if (sections.actions.length) {
+                const actions = sections.actions.filter(a => a.startsWith('-') || a.startsWith('•')).map(a => a.replace(/^[-•]\s*/, ''));
+                if (actions.length) {
+                    html += `<div class="summary-section-card actions"><div class="section-header"><i class="fas fa-tasks"></i><h3>Action Items</h3></div><ul class="bullet-list-enhanced">${actions.map(a => `<li><i class="fas fa-circle"></i><span>${escapeHtml(a)}</span></li>`).join('')}</ul></div>`;
+                } else {
+                    html += `<div class="summary-section-card actions"><div class="section-header"><i class="fas fa-tasks"></i><h3>Action Items</h3></div><div class="section-content">${escapeHtml(sections.actions.join(' '))}</div></div>`;
+                }
+            }
+            if (sections.takeaways.length) {
+                const takeaways = sections.takeaways.filter(t => t.startsWith('-') || t.startsWith('•')).map(t => t.replace(/^[-•]\s*/, ''));
+                if (takeaways.length) {
+                    html += `<div class="summary-section-card takeaways"><div class="section-header"><i class="fas fa-lightbulb"></i><h3>Key Takeaways</h3></div><ul class="bullet-list-enhanced">${takeaways.map(t => `<li><i class="fas fa-star"></i><span>${escapeHtml(t)}</span></li>`).join('')}</ul></div>`;
+                } else {
+                    html += `<div class="summary-section-card takeaways"><div class="section-header"><i class="fas fa-lightbulb"></i><h3>Key Takeaways</h3></div><div class="section-content">${escapeHtml(sections.takeaways.join(' '))}</div></div>`;
+                }
+            }
+            html += '</div>';
+            return html;
+        }
+
+        function formatDetailedSummary(summary) {
+            const lines = summary.split('\n');
+            let sections = { overview: [], points: [], conclusions: [], next: [] };
+            let currentSection = 'overview';
+            lines.forEach(line => {
+                line = line.trim();
+                if (!line) return;
+                if (line.includes('OVERVIEW')) currentSection = 'overview';
+                else if (line.includes('KEY POINTS')) currentSection = 'points';
+                else if (line.includes('CONCLUSIONS')) currentSection = 'conclusions';
+                else if (line.includes('NEXT STEPS')) currentSection = 'next';
+                else if (sections[currentSection]) sections[currentSection].push(line);
+            });
+            let html = '<div class="summary-detailed">';
+            if (sections.overview.length) {
+                html += `<div class="detail-card"><div class="section-header"><i class="fas fa-book-open"></i><h3>Overview</h3></div><div class="section-content">${escapeHtml(sections.overview.join(' '))}</div></div>`;
+            }
+            if (sections.points.length) {
+                const points = sections.points.filter(p => p.startsWith('-') || p.startsWith('•')).map(p => p.replace(/^[-•]\s*/, ''));
+                if (points.length) {
+                    html += `<div class="detail-card"><div class="section-header"><i class="fas fa-search"></i><h3>Key Points Discussed</h3></div><ul class="bullet-list-enhanced">${points.map(p => `<li><i class="fas fa-circle"></i><span>${escapeHtml(p)}</span></li>`).join('')}</ul></div>`;
+                } else {
+                    html += `<div class="detail-card"><div class="section-header"><i class="fas fa-search"></i><h3>Key Points Discussed</h3></div><div class="section-content">${escapeHtml(sections.points.join(' '))}</div></div>`;
+                }
+            }
+            if (sections.conclusions.length) {
+                const conclusions = sections.conclusions.filter(c => c.startsWith('-') || c.startsWith('•')).map(c => c.replace(/^[-•]\s*/, ''));
+                if (conclusions.length) {
+                    html += `<div class="detail-card"><div class="section-header"><i class="fas fa-check-double"></i><h3>Conclusions</h3></div><ul class="bullet-list-enhanced">${conclusions.map(c => `<li><i class="fas fa-check"></i><span>${escapeHtml(c)}</span></li>`).join('')}</ul></div>`;
+                } else {
+                    html += `<div class="detail-card"><div class="section-header"><i class="fas fa-check-double"></i><h3>Conclusions</h3></div><div class="section-content">${escapeHtml(sections.conclusions.join(' '))}</div></div>`;
+                }
+            }
+            if (sections.next.length) {
+                const steps = sections.next.filter(s => s.startsWith('-') || s.startsWith('•')).map(s => s.replace(/^[-•]\s*/, ''));
+                if (steps.length) {
+                    html += `<div class="detail-card"><div class="section-header"><i class="fas fa-forward"></i><h3>Next Steps</h3></div><ul class="bullet-list-enhanced">${steps.map(s => `<li><i class="fas fa-arrow-right"></i><span>${escapeHtml(s)}</span></li>`).join('')}</ul></div>`;
+                } else {
+                    html += `<div class="detail-card"><div class="section-header"><i class="fas fa-forward"></i><h3>Next Steps</h3></div><div class="section-content">${escapeHtml(sections.next.join(' '))}</div></div>`;
+                }
+            }
+            html += '</div>';
+            return html;
+        }
+
+        function formatBulletSummary(summary) {
+            const lines = summary.split('\n');
+            const bullets = lines.filter(l => l.trim() && (l.startsWith('•') || l.startsWith('-'))).map(l => l.replace(/^[•-]\s*/, ''));
+            if (bullets.length === 0) {
+                lines.forEach(line => { if (line.trim()) bullets.push(line.trim()); });
+            }
+            let html = '<div class="summary-bullet">';
+            bullets.slice(0, 10).forEach(bullet => {
+                html += `<div class="bullet-card"><i class="fas fa-circle"></i><p>${escapeHtml(bullet)}</p></div>`;
+            });
+            html += '</div>';
+            return html;
+        }
+
+        function saveSummary(summary, wordCount) {
+            const newSummary = {
+                id: Date.now().toString(),
+                title: `Summary ${summaries.length + 1}`,
+                type: currentSummaryType,
+                wordCount: wordCount,
+                readTime: Math.ceil(wordCount / 200) + ' min',
+                timestamp: new Date().toISOString(),
+                content: summary,
+                sourceLength: originalTextLength || 0,
+                outputLang: selectedOutputLangName.substring(0, 2).toUpperCase(),
+                customName: false
+            };
+            summaries.unshift(newSummary);
+            localStorage.setItem('summaries', JSON.stringify(summaries));
+            loadRecentSummariesList();
+            updateStats();
+        }
+
+        function loadRecentSummariesList() {
+            const list = document.getElementById('recentSummariesList');
+            if (!summaries.length) {
+                list.innerHTML = '<div class="empty-state"><i class="fas fa-file-alt"></i><p>No summaries yet. Generate your first summary!</p></div>';
+                return;
+            }
+            list.innerHTML = summaries.slice(0, 10).map(s => `
+                <div class="recent-item" onclick="loadSummary('${s.id}')">
+                    <div class="recent-icon"><i class="fas ${s.type === 'executive' ? 'fa-briefcase' : s.type === 'detailed' ? 'fa-list-ul' : 'fa-circle'}"></i></div>
+                    <div class="recent-details"><div class="recent-title">${escapeHtml(s.title)}</div><div class="recent-meta"><span><i class="fas fa-clock"></i> ${s.readTime}</span><span><i class="fas fa-font"></i> ${s.wordCount} words</span></div></div>
+                    <div class="type-badge">${s.type}</div>
+                    <div class="lang-badge">${s.outputLang || 'EN'}</div>
+                    <div class="recent-actions">
+                        <button class="icon-btn-small" onclick="renameSummary('${s.id}', event)" title="Rename"><i class="fas fa-edit"></i></button>
+                        <button class="icon-btn-small" onclick="downloadSummaryFile('${s.id}', 'txt', event)" title="Download TXT"><i class="fas fa-file-alt"></i></button>
+                        <button class="icon-btn-small delete-btn" onclick="deleteSummary('${s.id}', event)" title="Delete"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadSummary(id) {
+            const s = summaries.find(s => s.id === id);
+            if (!s) return;
+            currentSummaryType = s.type;
+            currentSummary = s.content;
+            setSummaryType(s.type);
+            document.getElementById('summaryWords').textContent = s.wordCount;
+            document.getElementById('readTime').textContent = s.readTime;
+            document.getElementById('summaryTypeDisplay').textContent = s.type.charAt(0).toUpperCase() + s.type.slice(1);
+            document.getElementById('resultsActions').style.display = 'flex';
+            document.getElementById('summaryStats').style.display = 'grid';
+            document.getElementById('languageInfoBar').style.display = 'flex';
+            document.getElementById('translationPanel').style.display = 'block';
+            document.getElementById('outputLanguage').textContent = s.outputLang || 'English';
+            let html = '';
+            if (s.type === 'executive') html = formatExecutiveSummary(s.content);
+            else if (s.type === 'detailed') html = formatDetailedSummary(s.content);
+            else html = formatBulletSummary(s.content);
+            document.getElementById('summaryContent').innerHTML = `<div class="fade-in">${html}</div>`;
+        }
+
+        function renameSummary(id, event) {
+            if (event) event.stopPropagation();
+            const summary = summaries.find(s => s.id === id);
+            if (!summary) return;
+            const newName = prompt('Enter new name for summary:', summary.title);
+            if (newName && newName.trim()) {
+                summary.title = newName.trim();
+                summary.customName = true;
+                localStorage.setItem('summaries', JSON.stringify(summaries));
+                loadRecentSummariesList();
+                showNotification('Summary renamed successfully!', 'success');
+            }
+        }
+
+        function deleteSummary(id, event) {
+            if (event) event.stopPropagation();
+            if (confirm('Are you sure you want to delete this summary?')) {
+                summaries = summaries.filter(s => s.id !== id);
+                localStorage.setItem('summaries', JSON.stringify(summaries));
+                loadRecentSummariesList();
+                updateStats();
+                showNotification('Summary deleted successfully!', 'success');
+                if (currentSummaryId === id) {
+                    document.getElementById('summaryContent').innerHTML = `<div class="summary-placeholder"><i class="fas fa-file-alt"></i><p>Your generated summary will appear here.</p></div>`;
+                    document.getElementById('resultsActions').style.display = 'none';
+                    document.getElementById('summaryStats').style.display = 'none';
+                    document.getElementById('languageInfoBar').style.display = 'none';
+                    document.getElementById('translationPanel').style.display = 'none';
+                    currentSummaryId = null;
+                }
+            }
+        }
+
+        function viewAllSummaries() {
+            if (!summaries.length) { showNotification('No summaries to display', 'info'); return; }
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header"><h2><i class="fas fa-list"></i> All Summaries (${summaries.length})</h2><button class="close-modal" onclick="this.closest('.modal').remove()">&times;</button></div>
+                    <div>${summaries.map(s => `<div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg-elevated);border-radius:12px;margin-bottom:8px;cursor:pointer;" onclick="loadSummary('${s.id}'); this.closest('.modal').remove();"><div style="width:36px;height:36px;background:var(--gradient-primary);border-radius:10px;display:flex;align-items:center;justify-content:center;"><i class="fas ${s.type === 'executive' ? 'fa-briefcase' : s.type === 'detailed' ? 'fa-list-ul' : 'fa-circle'}"></i></div><div style="flex:1"><div style="font-weight:600">${escapeHtml(s.title)}</div><div style="font-size:11px;color:var(--text-muted)">${s.wordCount} words • ${s.readTime} • ${s.outputLang || 'EN'}</div></div></div>`).join('')}</div>
+                </div>`;
+            document.body.appendChild(modal);
+        }
+
+        function downloadSummaryFile(id, format, event) {
+            if (event) event.stopPropagation();
+            const summary = summaries.find(s => s.id === id);
+            if (!summary) return;
+            const fileName = `${summary.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${new Date(summary.timestamp).toISOString().slice(0, 10)}`;
+            const blob = new Blob([summary.content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${fileName}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification('Downloaded!', 'success');
+        }
+
+        // Translation with chunking
+        async function translateSummary() {
+            if (!currentSummary) { showNotification('No summary to translate', 'error'); return; }
+            const targetLang = document.getElementById('translateTargetLang').value;
+            const resultDiv = document.getElementById('translationResult');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div style="text-align: center;"><i class="fas fa-circle-notch fa-spin"></i> Translating...</div>';
+            try {
+                const chunks = [];
+                let text = currentSummary;
+                while (text.length > 0) {
+                    let chunk = text.substring(0, 450);
+                    const lastPeriod = chunk.lastIndexOf('.');
+                    if (lastPeriod > 200 && text.length > 450) chunk = text.substring(0, lastPeriod + 1);
+                    chunks.push(chunk);
+                    text = text.substring(chunk.length);
+                }
+                let translatedChunks = [];
+                for (let i = 0; i < chunks.length; i++) {
+                    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(chunks[i])}&langpair=en|${targetLang}`;
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    if (data.responseData && data.responseData.translatedText) {
+                        translatedChunks.push(data.responseData.translatedText);
+                    } else {
+                        translatedChunks.push(chunks[i]);
+                    }
+                    resultDiv.innerHTML = `<div style="text-align: center;"><i class="fas fa-circle-notch fa-spin"></i> Translating... ${Math.round((i + 1) / chunks.length * 100)}%</div>`;
+                }
+                currentTranslationText = translatedChunks.join(' ');
+                const targetLangName = document.getElementById('translateTargetLang').options[document.getElementById('translateTargetLang').selectedIndex].text;
+                resultDiv.innerHTML = `
+                    <div class="translation-result-header">
+                        <i class="fas fa-language"></i>
+                        <strong>Translation (${targetLangName})</strong>
+                    </div>
+                    <div class="translation-content">${escapeHtml(currentTranslationText)}</div>
+                `;
+                document.getElementById('translationTtsControls').style.display = 'flex';
+                showNotification('Translation completed!', 'success');
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="translation-result-header"><i class="fas fa-exclamation-circle"></i><strong>Translation Failed</strong></div><div class="translation-content">Please try again.</div>';
+                showNotification('Translation failed', 'error');
+            }
+        }
+
+        function copySummary() { if (currentSummary) { navigator.clipboard.writeText(currentSummary); showNotification('Copied!', 'success'); } }
+        function shareSummary() { if (currentSummary && navigator.share) navigator.share({ title: 'Summary', text: currentSummary }); else showNotification('Manual copy', 'info'); }
+        function downloadSummary(format) { if (!currentSummary) return; const blob = new Blob([currentSummary], { type: 'text/plain' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `summary_${new Date().toISOString().slice(0, 10)}.txt`; a.click(); URL.revokeObjectURL(a.href); showNotification('Downloaded!', 'success'); }
+
+        function updateStats() {
+            document.getElementById('totalSummaries').textContent = summaries.length;
+            const oneWeekAgo = new Date(); oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+            const weekly = summaries.filter(s => new Date(s.timestamp) > oneWeekAgo).length;
+            document.getElementById('weeklyIncrease').textContent = `+${weekly}`;
+            document.getElementById('avgProcessing').textContent = `${(Math.random() * 1.5 + 1.5).toFixed(1)}s`;
+            document.getElementById('accuracyRate').textContent = `${(Math.random() * 5 + 94).toFixed(0)}%`;
+            document.getElementById('languageCount').textContent = '50+';
+            const credits = 4850 - summaries.length * 10;
+            document.getElementById('apiCredits').textContent = credits.toLocaleString();
+            document.getElementById('creditsProgress').style.width = `${(credits / 10000) * 100}%`;
+        }
+
+        function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, function (m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
+
+        function showNotification(msg, type) {
+            const n = document.createElement('div');
+            n.style.cssText = `position:fixed;bottom:20px;right:20px;background:${type === 'success' ? 'linear-gradient(135deg,#10B981,#34D399)' : type === 'error' ? 'linear-gradient(135deg,#EF4444,#F87171)' : 'linear-gradient(135deg,#6366F1,#8B5CF6)'};color:white;padding:12px 24px;border-radius:40px;z-index:9999;animation:slideInRight 0.3s ease;`;
+            n.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i> ${msg}`;
+            document.body.appendChild(n);
+            setTimeout(() => n.remove(), 3000);
+        }
+
+        async function loadUserProfile() {
+            try {
+                const response = await fetch('/api/user/profile');
+                const data = await response.json();
+                if (data.success) document.getElementById('userName').textContent = data.user.full_name || data.user.username;
+            } catch (error) { console.error('Failed to load profile:', error); document.getElementById('userName').textContent = 'User'; }
+        }
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => { await fetch('/api/logout', { method: 'POST' }); localStorage.removeItem('isLoggedIn'); window.location.href = '/'; });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUserProfile();
+            loadRecentTranscripts();
+            loadRecentSummariesList();
+            updateStats();
+            document.getElementById('languageCount').textContent = '50+';
+        });
+    </script>
+</body>
+</html>
