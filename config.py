@@ -33,6 +33,14 @@ class Config:
     SARVAM_API_KEY = os.environ.get('SARVAM_API_KEY', '')
     GOOGLE_GEMINI_API_KEY = os.environ.get('GOOGLE_GEMINI_API_KEY', '')
     GROQ_API_KEY = os.environ.get('GROQ_API_KEY', '')
+    QDRANT_URL = os.environ.get('QDRANT_URL', '')
+    QDRANT_API_KEY = os.environ.get('QDRANT_API_KEY', '')
+    QDRANT_COLLECTION = os.environ.get('QDRANT_COLLECTION')
+    QDRANT_VECTOR_SIZE = int(os.environ.get('QDRANT_VECTOR_SIZE', '256'))
+    GROQ_CHAT_MODEL = os.environ.get('GROQ_CHAT_MODEL', 'llama-3.1-8b-instant')
+    RAG_TOP_K = int(os.environ.get('RAG_TOP_K', '5'))
+    RAG_CHUNK_WORDS = int(os.environ.get('RAG_CHUNK_WORDS', '120'))
+    RAG_CHUNK_OVERLAP = int(os.environ.get('RAG_CHUNK_OVERLAP', '30'))
     
     # Language configuration
     SUPPORTED_LANGUAGES = {

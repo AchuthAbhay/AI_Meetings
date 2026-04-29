@@ -1432,6 +1432,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="/ai-chat" class="nav-link">
+                        <i class="fas fa-robot nav-icon"></i>
+                        <span class="nav-text">AI Chat</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="/translation" class="nav-link">
                         <i class="fas fa-language nav-icon"></i>
                         <span class="nav-text">Translation</span>
@@ -1654,6 +1660,8 @@
         async function loadSelectedTranscript() {
             const selectedId = document.getElementById('transcriptSelect').value;
             if (!selectedId) return;
+            window.currentTranscriptId = Number(selectedId);
+            localStorage.setItem('currentTranscriptId', String(selectedId));
             try {
                 const response = await fetch(`/api/transcripts/${selectedId}`);
                 const data = await response.json();

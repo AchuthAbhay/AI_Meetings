@@ -1857,6 +1857,7 @@
             .recent-item {
                 flex-wrap: wrap;
             }
+            
         }
     </style>
 </head>
@@ -1898,6 +1899,12 @@
                     <a href="/summarization" class="nav-link">
                         <i class="fas fa-file-alt nav-icon"></i>
                         <span class="nav-text">Summarization</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/ai-chat" class="nav-link">
+                        <i class="fas fa-robot nav-icon"></i>
+                        <span class="nav-text">AI Chat</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -2200,6 +2207,19 @@
         let currentAudioUrl = null;
         let currentPlaybackSpeed = 1;
 
+        function syncCurrentTranscriptId(id) {
+            if (id === null || id === undefined || Number.isNaN(Number(id))) {
+                currentTranscriptId = null;
+                window.currentTranscriptId = null;
+                localStorage.removeItem('currentTranscriptId');
+                return;
+            }
+
+            currentTranscriptId = Number(id);
+            window.currentTranscriptId = currentTranscriptId;
+            localStorage.setItem('currentTranscriptId', String(currentTranscriptId));
+        }
+
         // ========== AUDIO PLAYBACK ==========
         function setPlaybackSpeed(speed) {
             currentPlaybackSpeed = speed;
@@ -2247,7 +2267,7 @@
                     metadata: { language: 'en', language_name: 'English', confidence: 0.95, total_words: 45 }
                 };
                 currentTranscript = mockTranscript;
-                currentTranscriptId = Date.now();
+                syncCurrentTranscriptId(Date.now());
                 displayTranscript(mockTranscript, 'English');
                 showNotification('Transcription completed!', 'success');
                 loadTranscripts();
@@ -2574,7 +2594,7 @@
                     progressPercentage.textContent = '100%';
                     
                     currentTranscript = data.transcript;
-                    currentTranscriptId = data.db_id;
+                    syncCurrentTranscriptId(data.db_id);
                     
                     setTimeout(() => {
                         progressSection.style.display = 'none';
@@ -2589,53 +2609,58 @@
         }
 
         // ========== LOAD TRANSCRIPTS ==========
-        async function loadTranscripts() {
-            try {
-                const response = await fetch('/api/transcripts');
-                const data = await response.json();
-                const recentList = document.getElementById('recentTranscriptsList');
-                
-                if (!data.success || !data.transcripts || data.transcripts.length === 0) {
-                    recentList.innerHTML = `<div class="empty-state"><i class="fas fa-file-audio"></i><p>No transcriptions yet. Upload your first file.</p></div>`;
-                    return;
-                }
-                
-                const recent = data.transcripts.slice(0, 5);
-                let totalDuration = 0;
-                const languages = new Set();
-                
-                recentList.innerHTML = recent.map(t => {
-                    totalDuration += t.duration || 0;
-                    if (t.language_name) languages.add(t.language_name);
-                    return `
-                        <div class="recent-item" data-id="${t.id}">
-                            <div class="recent-icon"><i class="fas fa-file-audio"></i></div>
-                            <div class="recent-details" onclick="loadTranscriptFromDB(${t.id})">
-                                <div class="recent-title">${escapeHtml(t.title || t.filename)}</div>
-                                <div class="recent-meta">
-                                    <span><i class="fas fa-clock"></i> ${formatDuration(t.duration)}</span>
-                                    <span><i class="fas fa-user-friends"></i> ${t.speaker_count || 0}</span>
-                                </div>
-                            </div>
-                            <span class="language-badge">${t.language_name || t.language || 'EN'}</span>
-                            <div class="recent-actions-menu">
-                                <button class="action-icon" onclick="event.stopPropagation(); viewTranscript(${t.id})" title="View"><i class="fas fa-eye"></i></button>
-                                <button class="action-icon" onclick="event.stopPropagation(); downloadTranscript(${t.id})" title="Download"><i class="fas fa-download"></i></button>
-                                <button class="action-icon" onclick="event.stopPropagation(); showRenameModal(${t.id}, '${escapeHtml(t.title || t.filename)}')" title="Rename"><i class="fas fa-edit"></i></button>
-                                <button class="action-icon" onclick="event.stopPropagation(); shareTranscriptItem(${t.id}, '${escapeHtml(t.title || t.filename)}')" title="Share"><i class="fas fa-share-alt"></i></button>
-                                <button class="action-icon delete" onclick="event.stopPropagation(); deleteTranscriptItem(${t.id})" title="Delete"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-                
-                document.getElementById('totalFiles').textContent = data.transcripts.length;
-                document.getElementById('totalDuration').textContent = Math.floor(totalDuration / 60);
-                document.getElementById('totalLanguages').textContent = languages.size || '0';
-            } catch (error) {
-                console.error('Failed to load transcripts:', error);
-            }
+       async function loadTranscripts() {
+    try {
+        const response = await fetch('/api/transcripts');
+        const data = await response.json();
+        const recentList = document.getElementById('recentTranscriptsList');
+
+        // 1. Handle Empty State
+        if (!data.success || !data.transcripts || data.transcripts.length === 0) {
+            recentList.innerHTML = `<div class="empty-state"><i class="fas fa-file-audio"></i><p>No transcriptions yet. Upload your first file.</p></div>`;
+            return; // Function stops here if no files exist
         }
+
+        // 2. Update the "Recent" UI List
+        const recent = data.transcripts.slice(0, 5);
+        let totalDuration = 0;
+        const languages = new Set();
+
+        recentList.innerHTML = recent.map(t => {
+            totalDuration += t.duration || 0;
+            if (t.language_name) languages.add(t.language_name);
+            return `
+                <div class="recent-item" data-id="${t.id}">
+                    <div class="recent-icon"><i class="fas fa-file-audio"></i></div>
+                    <div class="recent-details" onclick="loadTranscriptFromDB(${t.id})">
+                        <div class="recent-title">${escapeHtml(t.title || t.filename)}</div>
+                        <div class="recent-meta">
+                            <span><i class="fas fa-clock"></i> ${formatDuration(t.duration)}</span>
+                            <span><i class="fas fa-user-friends"></i> ${t.speaker_count || 0}</span>
+                        </div>
+                    </div>
+                    <span class="language-badge">${t.language_name || t.language || 'EN'}</span>
+                    <div class="recent-actions-menu">
+                        <button class="action-icon" onclick="event.stopPropagation(); viewTranscript(${t.id})" title="View"><i class="fas fa-eye"></i></button>
+                        <button class="action-icon" onclick="event.stopPropagation(); downloadTranscript(${t.id})" title="Download"><i class="fas fa-download"></i></button>
+                        <button class="action-icon" onclick="event.stopPropagation(); showRenameModal(${t.id}, '${escapeHtml(t.title || t.filename)}')" title="Rename"><i class="fas fa-edit"></i></button>
+                        <button class="action-icon" onclick="event.stopPropagation(); shareTranscriptItem(${t.id}, '${escapeHtml(t.title || t.filename)}')" title="Share"><i class="fas fa-share-alt"></i></button>
+                        <button class="action-icon delete" onclick="event.stopPropagation(); deleteTranscriptItem(${t.id})" title="Delete"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // 5. Update Stat Counters
+        document.getElementById('totalFiles').textContent = data.transcripts.length;
+        document.getElementById('totalDuration').textContent = Math.floor(totalDuration / 60);
+        document.getElementById('totalLanguages').textContent = languages.size || '0';
+
+    } catch (error) {
+        console.error('Failed to load transcripts:', error);
+    }
+}
+        
 
         // ========== TRANSCRIPT CRUD ==========
         async function loadTranscriptFromDB(id) {
@@ -2644,7 +2669,7 @@
                 const data = await response.json();
                 if (data.success) {
                     currentTranscript = data.transcript.full_data;
-                    currentTranscriptId = data.transcript.id;
+                    syncCurrentTranscriptId(data.transcript.id);
                     displayTranscript(currentTranscript, data.transcript.language_name || 'English');
                     showNotification('Transcript loaded!', 'success');
                     document.querySelector('.results-card').scrollIntoView({ behavior: 'smooth' });
@@ -2722,6 +2747,7 @@
                     showNotification('Deleted!', 'success');
                     loadTranscripts();
                     if (currentTranscriptId === id) {
+                        syncCurrentTranscriptId(null);
                         document.getElementById('transcriptPlaceholder').style.display = 'block';
                         document.getElementById('transcriptDisplay').style.display = 'none';
                         document.getElementById('resultsActions').style.display = 'none';
@@ -2933,6 +2959,7 @@
         document.getElementById('logoutBtn').addEventListener('click', async () => { await fetch('/api/logout', { method: 'POST' }); window.location.href = '/'; });
 
         document.addEventListener('DOMContentLoaded', async () => {
+            syncCurrentTranscriptId(localStorage.getItem('currentTranscriptId'));
             const response = await fetch('/api/user/profile');
             if (response.ok) {
                 const data = await response.json();
@@ -2942,6 +2969,8 @@
                 }
             }
         });
+
     </script>
 </body>
 </html>
+

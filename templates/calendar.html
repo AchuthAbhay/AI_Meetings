@@ -1157,6 +1157,7 @@
                 <li class="nav-item"><a href="/live-transcription" class="nav-link"><i class="fas fa-microphone-alt nav-icon"></i><span class="nav-text">Live Transcription</span></a></li>
                 <li class="nav-item"><a href="/upload-transcribe" class="nav-link"><i class="fas fa-upload nav-icon"></i><span class="nav-text">Upload & Transcribe</span></a></li>
                 <li class="nav-item"><a href="/summarization" class="nav-link"><i class="fas fa-file-alt nav-icon"></i><span class="nav-text">Summarization</span></a></li>
+                <li class="nav-item"><a href="/ai-chat" class="nav-link"><i class="fas fa-robot nav-icon"></i><span class="nav-text">AI Chat</span></a></li>
                 <li class="nav-item"><a href="/my-tasks" class="nav-link"><i class="fas fa-tasks nav-icon"></i><span class="nav-text">My Tasks</span></a></li>
                 <li class="nav-item"><a href="/speaker-identification" class="nav-link"><i class="fas fa-user-friends nav-icon"></i><span class="nav-text">Speaker ID</span></a></li>
                 <li class="nav-item"><a href="/sentiment-analysis" class="nav-link"><i class="fas fa-smile nav-icon"></i><span class="nav-text">Sentiment</span></a></li>
@@ -1245,9 +1246,7 @@
 
         // ========== CALENDAR INTEGRATION ==========
         
-        if (!localStorage.getItem('isLoggedIn')) {
-            window.location.href = '/';
-        }
+
 
         // Calendar state
         let currentDate = new Date();

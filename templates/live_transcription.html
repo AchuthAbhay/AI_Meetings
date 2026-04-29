@@ -529,6 +529,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="/ai-chat" class="nav-link">
+                        <i class="fas fa-robot nav-icon"></i>
+                        <span class="nav-text">AI Chat</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="/my-tasks" class="nav-link">
                         <i class="fas fa-tasks nav-icon"></i>
                         <span class="nav-text">My Tasks</span>
@@ -705,9 +711,6 @@
 
         // ========== MULTI-LANGUAGE LIVE TRANSCRIPTION WITH ORIGINAL SCRIPT PRESERVATION ==========
         
-        if (!localStorage.getItem('isLoggedIn')) { 
-            window.location.href = '/'; 
-        }
 
         // DOM Elements
         const startBtn = document.getElementById('startRecordBtn');
@@ -1308,6 +1311,33 @@
                 updateSessionCount();
             }
         }
+        async function loadRecordingsFromBackend() {
+    try {
+        const response = await fetch('/api/live/history');
+        const data = await response.json();
+
+        if (data.success && Array.isArray(data.history)) {
+            // Expect data.history to be an array of sessions from your DB
+            // Adapt fields here to match what your /api/live/history returns
+            recordings = data.history.map(s => ({
+                id: s.id || s.session_id || Date.now(),
+                timestamp: s.created_at || s.timestamp || new Date().toISOString(),
+                transcript: s.transcript_segments || s.transcript || [],
+                transcript_text: s.transcript_text || '',
+                languages: s.languages || [],
+                duration: s.duration_display || s.duration || '00:00',
+                title: s.title || s.session_name || `Session ${s.id}`
+            }));
+
+            updateSessionCount();     // this calls renderHistory()
+        }
+    } catch (err) {
+        console.error('Failed to load live history:', err);
+        // fall back to local storage
+        loadRecordingsFromStorage();
+    }
+}
+
         
         // Event listeners
         startBtn.onclick = startRecording;
@@ -1327,9 +1357,10 @@
         
         // Initialize
         document.addEventListener('DOMContentLoaded', async () => {
-            await loadUserProfile();
-            loadRecordingsFromStorage();
-        });
+    await loadUserProfile();
+    await loadRecordingsFromBackend();   // primary source: DB
+    loadRecordingsFromStorage();        // optional backup/merge from local
+});
     </script>
 </body>
 </html>

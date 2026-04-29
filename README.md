@@ -1,61 +1,76 @@
-<<<<<<< HEAD
+# InsightFlow AI
 
----
-
-🎙️ AudioToAction — Intelligent Meeting Minutes Generator
-
-AudioToAction is an end-to-end AI system that automatically converts meeting audio into structured, actionable meeting minutes. It performs transcription, speaker identification, summarization, sentiment analysis, and action-item extraction — transforming raw conversations into meaningful insights.
-
-This project is designed for real-world use cases such as corporate meetings, academic discussions, team standups, and government or organizational sessions.
+InsightFlow AI is a Flask-based dashboard for transcription, summarization, action-item extraction, sentiment analysis, translation, and transcript-aware AI chat.
 
 
----
+## UI Preview
+
+### Marketing Landing Page
+![Marketing landing page](docs/images/landingpage.jpeg)
+
+### Dashboard
+![InsightFlow AI Dashboard](docs/images/dashboard.jpeg)
+
+### Upload & Transcribe
+![Upload and Transcribe](docs/images/transcibe.jepeg)
+
+### AI Summarization & Translation
+![Summarization](docs/images/summarization.jpeg)
+
+### AI Chat
+![AI Chat over transcripts](docs/images/aichat.jpeg)
+
+### Speaker Identification
+![Speaker Identification](docs/images/speakeridentification.jpeg)
+
+### Sentiment Analysis
+![Sentiment Analysis](docs/images/sentiment.jpeg)
+
+### Calendar & Tasks
+![Calendar Integration](docs/images/calendar.jpeg)
 
 
 
-=======
-# InsightFlow AI - Intelligent Meeting Transcription & Analysis
+## Core stack
 
-![InsightFlow AI](https://img.shields.io/badge/version-1.0.0-blue)
-![Python](https://img.shields.io/badge/python-3.11-green)
-![Flask](https://img.shields.io/badge/flask-3.0-red)
-![License](https://img.shields.io/badge/license-MIT-yellow)
+- Flask
+- SQLAlchemy + Flask-Migrate
+- AssemblyAI / Groq
+- Qdrant for transcript retrieval
+- HTML / CSS / JavaScript dashboard templates
 
-## 🚀 Overview
+## Main app areas
 
-InsightFlow AI is a powerful, AI-powered platform that transforms audio conversations into actionable intelligence. It provides real-time transcription, speaker identification, sentiment analysis, action item extraction, and smart summarization for meetings, interviews, lectures, and more.
+- `app.py` - routes and app wiring
+- `models.py` - database models
+- `config.py` - environment-driven configuration
+- `modules/` - transcription, summarization, sentiment, translation, YouTube, and live transcription logic
+- `services/` - RAG chat and Qdrant indexing/search
+- `templates/` - dashboard and module pages
+- `static/` - shared frontend assets
 
-## ✨ Key Features
+## Environment
 
-- **🎤 Real-Time Transcription** - Live speech-to-text with 95%+ accuracy
-- **🌐 Multi-Language Support** - 50+ languages including Hindi, Marathi, Tamil, Telugu, Bengali
-- **👥 Speaker Identification** - Automatically distinguishes between different speakers
-- **📝 Smart Summarization** - AI-generated executive summaries and key points
-- **✅ Action Item Tracking** - Automatically extract tasks, assignees, and deadlines
-- **😊 Sentiment Analysis** - Real-time emotion and tone detection
-- **🔒 Enterprise Security** - Bank-level encryption for all data
-- **💾 Cloud Storage** - Secure storage with Supabase integration
+Create a `.env` with the API keys and runtime settings the app needs, including:
 
-## 🛠️ Tech Stack
+- `SECRET_KEY`
+- `ASSEMBLYAI_API_KEY`
+- `GROQ_API_KEY`
+- `QDRANT_URL`
+- `QDRANT_API_KEY`
+- `QDRANT_COLLECTION`
 
-- **Backend**: Python Flask, SQLAlchemy
-- **Database**: SQLite (dev) / PostgreSQL (prod)
-- **AI/ML**: AssemblyAI, Groq LLM, TextBlob
-- **Frontend**: HTML5, Tailwind CSS, JavaScript
-- **Cloud**: Supabase Storage
-- **Authentication**: Flask-Login
+## Run locally
 
-## 📋 Prerequisites
-
-- Python 3.11 or higher
-- AssemblyAI API Key
-- Supabase Account (optional, for cloud storage)
-- Microphone (for live transcription)
-
-## 🚀 Installation
-
-1. **Clone the repository**
 ```bash
-git clone https://github.com/YOUR_USERNAME/InsightFlow-AI.git
-cd InsightFlow-AI
->>>>>>> harshada
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+python app.py
+```
+
+## Notes
+
+- The AI Chat page is available at `/ai-chat`.
+- Transcript indexing into Qdrant uses the `services/rag_index_service.py` pipeline.
+- Existing transcripts can be reindexed through `POST /api/chat/reindex`.

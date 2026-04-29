@@ -3,124 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<<<<<<< HEAD
-    <title>Meeting Minutes Generator</title>
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-</head>
-
-<body>
-<div class="container">
-
-    <!-- HEADER -->
-    <header class="header">
-        <h1><i class="fas fa-microphone"></i> Meeting Minutes Generator</h1>
-        <p>Audio → Transcript → Speaker-aware Summary</p>
-    </header>
-
-    <!-- UPLOAD -->
-    <section class="upload-section">
-        <div class="upload-box" id="uploadBox">
-            <i class="fas fa-cloud-upload-alt upload-icon"></i>
-            <h3>Upload Meeting Audio</h3>
-            <p>Supports WAV, MP3, M4A, FLAC</p>
-
-            <input type="file" id="audioFile" accept=".wav,.mp3,.m4a,.flac" hidden>
-
-            <button class="upload-btn" onclick="document.getElementById('audioFile').click()">
-                <i class="fas fa-folder-open"></i> Choose File
-            </button>
-
-            <div class="file-name" id="fileName"></div>
-        </div>
-
-        <button class="transcribe-btn" id="transcribeBtn" onclick="transcribeAudio()" disabled>
-            <i class="fas fa-play"></i> Transcribe Meeting
-        </button>
-    </section>
-
-    <!-- PROGRESS -->
-    <section class="progress-section" id="progressSection" style="display:none;">
-        <div class="progress-bar">
-            <div class="progress-fill"></div>
-        </div>
-        <div class="progress-text">Processing audio...</div>
-    </section>
-
-    <!-- RESULTS -->
-    <section class="results-section" id="resultsSection" style="display:none;">
-
-        <!-- METRICS -->
-        <div class="metrics-grid">
-            <div class="metric-card">
-                <i class="fas fa-font"></i>
-                <div class="metric-value" id="wordCount">-</div>
-                <div class="metric-label">Words</div>
-            </div>
-
-            <div class="metric-card">
-                <i class="fas fa-clock"></i>
-                <div class="metric-value" id="duration">-</div>
-                <div class="metric-label">Duration</div>
-            </div>
-
-            <div class="metric-card">
-                <i class="fas fa-chart-line"></i>
-                <div class="metric-value" id="confidence">-</div>
-                <div class="metric-label">Avg Confidence</div>
-            </div>
-        </div>
-
-        <!-- TRANSCRIPT -->
-        <div class="transcript-section">
-            <h3><i class="fas fa-file-alt"></i> Transcript (Speaker-aware)</h3>
-            <div class="transcript-container" id="transcriptContainer"></div>
-        </div>
-
-<!-- ACTIONS -->
-<div class="actions">
-
-    <button class="download-btn" onclick="downloadTranscript()">
-        <i class="fas fa-download"></i> Download Transcript (JSON)
-    </button>
-
-    <button class="download-btn" id="generateSummaryBtn" onclick="generateSummary()" style="display:none;">
-        <i class="fas fa-align-left"></i> Generate Summary
-    </button>
-
-    <button class="download-btn" id="actionItemsBtn" onclick="extractActionItems()" style="display:none; background: #ffc107; color: #000;">
-        <i class="fas fa-tasks"></i> Extract Action Items
-    </button>
-
-    <button class="download-btn" id="sentimentBtn" onclick="analyzeSentiment()" style="display:none; background: #42c175; color: #fff;">
-        <i class="fas fa-brain"></i> Analyse Sentiment
-    </button>
-    
-</div>
-
-<div id="sentiment-output" class="result-container" style="display: none; margin-top: 20px;"></div>
-
-<div id="action-output" class="result-container" style="margin-top: 20px;"></div>
-
-<div id="sentiment-output" class="result-container" style="display: none; margin-top: 20px;"></div>
-
-
-        <!-- SUMMARY -->
-        <div class="summary-section" id="summarySection" style="display:none; margin-top:30px;">
-            <h3><i class="fas fa-file-signature"></i> Professional Meeting Summary</h3>
-            <div class="summary-container" id="summaryContainer"></div>
-
-            <div style="text-align:center; margin-top:20px;">
-                <button class="download-btn" id="downloadSummaryBtn" onclick="downloadSummary()">
-                    <i class="fas fa-file-pdf"></i> Download Summary PDF
-                </button>
-
-                <button class="download-btn" onclick="resetSession()"
-                        style="background:#6c757d; margin-left:10px;">
-                    Reset Session
-                </button>
-=======
     <title>InsightFlow: AI-Powered Audio Intelligence</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
@@ -535,19 +417,10 @@
                         </div>
                     </div>
                 </div>
->>>>>>> harshada
             </div>
         </div>
     </section>
 
-<<<<<<< HEAD
-</div>
-
-<script src="{{ url_for('static', filename='script.js') }}"></script>
-</body>
-</html>
-
-=======
     <!-- About Us Section -->
     <section class="py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div class="max-w-7xl mx-auto">
@@ -1309,4 +1182,3 @@
     </script>
 </body>
 </html>
->>>>>>> harshada
